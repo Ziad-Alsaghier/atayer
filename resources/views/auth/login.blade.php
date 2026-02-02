@@ -20,20 +20,20 @@
     <title>{{translate('messages.login')}}</title>
 
     <!-- Favicon -->
-<link rel="shortcut icon" href="{{ asset('assets/admin/img/favicon.png') }}">
+<link rel="shortcut icon" href="{{ asset('public/assets/admin/img/favicon.png') }}">
 
 <!-- Font -->
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 
 <!-- CSS Implementing Plugins -->
-<link rel="stylesheet" href="{{ asset('assets/admin/css/vendor.min.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/admin/vendor/icon-set/style.css') }}">
+<link rel="stylesheet" href="{{ asset('public/assets/admin/css/vendor.min.css') }}">
+<link rel="stylesheet" href="{{ asset('public/assets/admin/vendor/icon-set/style.css') }}">
 
 <!-- CSS Front Template -->
-<link rel="stylesheet" href="{{ asset('assets/admin/css/bootstrap.min.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/admin/css/theme.minc619.css?v=1.0') }}">
-<link rel="stylesheet" href="{{ asset('assets/admin/css/style.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/admin/css/toastr.css') }}">
+<link rel="stylesheet" href="{{ asset('public/assets/admin/css/bootstrap.min.css') }}">
+<link rel="stylesheet" href="{{ asset('public/assets/admin/css/theme.minc619.css?v=1.0') }}">
+<link rel="stylesheet" href="{{ asset('public/assets/admin/css/style.css') }}">
+<link rel="stylesheet" href="{{ asset('public/assets/admin/css/toastr.css') }}">
 
 </head>
 
@@ -46,7 +46,7 @@
                 @php($store_logo = \App\Models\BusinessSetting::where(['key' => 'logo'])->first()->value)
                <img
     src="{{ asset('storage/business/' . $store_logo) }}"
-    onerror="this.onerror=null;this.src='{{ asset('assets/admin/img/favicon.png') }}';"
+    onerror="this.onerror=null;this.src='{{ asset('public/assets/admin/img/favicon.png') }}';"
     alt="logo">
                 <h2 class="title">{{translate('Your')}} <span class="d-block">{{translate('All Service')}}</span> <strong class="text--039D55">{{translate('in one field')}}....</strong></h2>
             </div>
@@ -202,10 +202,10 @@
       </div>
       <div class="modal-body">
         <div class="forget-pass-content">
-          <img src="{{ asset('assets/admin/img/send-mail.svg') }}" alt="">
+          <img src="{{ asset('public/assets/admin/img/send-mail.svg') }}" alt="">
 
             <!-- After Succeed -->
-            <!-- <img src="{{asset('/public/assets/admin/img/sent-mail.svg')}}" alt=""> -->
+            <!-- <img src="{{asset('/public/public/assets/admin/img/sent-mail.svg')}}" alt=""> -->
             <h4>
                 {{ translate('Send_Mail_to_Your_Email') }} ? 
             </h4>
@@ -233,9 +233,9 @@
       </div>
       <div class="modal-body">
         <div class="forget-pass-content">
-          <img src="{{ asset('assets/admin/img/send-mail.svg') }}" alt="">
+          <img src="{{ asset('public/assets/admin/img/send-mail.svg') }}" alt="">
             <!-- After Succeed -->
-            <!-- <img src="{{asset('/public/assets/admin/img/sent-mail.svg')}}" alt=""> -->
+            <!-- <img src="{{asset('/public/public/assets/admin/img/sent-mail.svg')}}" alt=""> -->
             <h4>
                 {{ translate('messages.Send_Mail_to_Your_Email') }} ? 
             </h4>
@@ -261,7 +261,7 @@
         <div class="modal-body">
           <div class="forget-pass-content">
               <!-- After Succeed -->
-              <img src="{{asset('/public/assets/admin/img/sent-mail.svg')}}" alt="">
+              <img src="{{asset('/public/public/assets/admin/img/sent-mail.svg')}}" alt="">
               <h4>
                 {{ translate('A mail has been sent to your registered email') }}!
               </h4>
@@ -274,12 +274,12 @@
     </div>
   </div>
 <!-- JS Implementing Plugins -->
-<script src="{{ asset('assets/admin/js/vendor.min.js') }}"></script>
+<script src="{{ asset('public/assets/admin/js/vendor.min.js') }}"></script>
 
 <!-- JS Front -->
-<script src="{{ asset('assets/admin/js/theme.min.js') }}"></script>
+<script src="{{ asset('public/assets/admin/js/theme.min.js') }}"></script>
 
-<script src="{{ asset('assets/admin/js/toastr.js') }}"></script>
+<script src="{{ asset('public/assets/admin/js/toastr.js') }}"></script>
 
 {!! Toastr::message() !!}
 
@@ -402,7 +402,7 @@
 
 <!-- IE Support -->
 <script>
-    if (/MSIE \d|Trident.*rv:/.test(navigator.userAgent)) document.write('<script src="{{asset('public//assets/admin')}}/vendor/babel-polyfill/polyfill.min.js"><\/script>');
+    if (/MSIE \d|Trident.*rv:/.test(navigator.userAgent)) document.write('<script src="{{asset('public//public/assets/admin')}}/vendor/babel-polyfill/polyfill.min.js"><\/script>');
 </script>
 </body>
 </html>
