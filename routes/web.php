@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Webhook\AtayerWebhookController;
 use App\Models\User;
 use App\Models\DeliveryMan;
 use App\Exports\UsersExport;
@@ -24,6 +25,9 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+Route::post('/webhook/atayer', [AtayerWebhookController::class, 'handle']);
+
  Route::get('/clear-cache', function() {
  $exitCode = Artisan::call('cache:clear');
  return 'Application cache cleared';
