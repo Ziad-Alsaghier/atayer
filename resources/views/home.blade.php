@@ -18,8 +18,12 @@
         <div class="container">
             <div class="banner-content wow fadeInUp">
                 <h1 class="title">{{ $landing_data['fixed_header_title'] }}</h1>
-                <img class="w-100" onerror="this.src='{{ asset('public/assets/admin/img/160x160/img2.jpg') }}'"
-                    src="{{ asset('storage/app/public/business/' . $logo) }}" alt="">
+                    <img class="w-100"
+                    onerror="this.src='{{ asset('public/assets/admin/img/160x160/img2.jpg') }}'"
+                    src="{{ asset('storage/business/'.($logo ?? 'def.png')) }}"
+                    alt="">
+
+
                 <div class="text">
                     {{ $landing_data['fixed_header_sub_title'] }}
                 </div>
@@ -1897,9 +1901,19 @@
                     <div class="owl-theme owl-carousel" id="sync2">
                         @foreach ($modules as $key => $item)
                         <div class="item">
-                            <img class="__img-50" src="{{ asset('storage/app/public/module/') }}/{{ isset($item['icon']) ? $item['icon'] : null }}" onerror="this.src='{{asset('public/assets/admin/img/100x100/2.png')}}'" alt="">
-                            <div class="txt d-block">{{translate("messages.{$item->module_name}")}}</div>
+                        <img
+                        class="__img-50"
+                        src="{{ $item->icon
+                        ? asset('storage/module/' . $item->icon)
+                        : asset('public/assets/admin/img/100x100/2.png') }}"
+                        alt=""
+                        onerror="this.onerror=null; this.src='{{ asset('public/assets/admin/img/100x100/2.png') }}';">
+
+                        <div class="txt d-block">
+                        {{ translate("messages.{$item->module_name}") }}
                         </div>
+                        </div>
+
                         @endforeach
                     </div>
                 </div>
@@ -1915,9 +1929,15 @@
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-8">
-                            <div class="venture-img mx-1">
-                                <img src="{{ asset('storage/app/public/module/') }}/{{ isset($item['thumbnail']) ? $item['thumbnail'] : null }}" onerror="this.src='{{asset('public/assets/admin/img/100x100/2.png')}}'" alt="">
-                            </div>
+                        <div class="venture-img mx-1">
+                            <img
+                            src="{{ !empty($item->thumbnail)
+                            ? asset('storage/module/'.$item->thumbnail)
+                            : asset('public/assets/admin/img/100x100/2.png') }}"
+                            onerror="this.onerror=null;this.src='{{ asset('public/assets/admin/img/100x100/2.png') }}';"
+                            alt="">
+                        </div>
+
                         </div>
                     </div>
                 @endforeach
@@ -1933,14 +1953,20 @@
         <div class="container">
             <div class="main-category-slider owl-theme owl-carousel">
                 @foreach ($promotion_banner as $item)
-                <div class="category-slide-item"
-                    style="background: url({{asset('storage/app/public/promotional_banner')}}/{{ isset($item['image']) ? $item['image'] : null }}) no-repeat center center / cover">
+                    <div class="category-slide-item"
+                    style="background-image: url('{{ !empty($item->image)
+                    ? asset('storage/promotional_banner/'.$item->image)
+                    : asset('public/assets/admin/img/160x160/img2.jpg') }}');
+                    background-repeat: no-repeat;
+                    background-position: center;
+                    background-size: cover;">
                     <div>
-                        <h2 class="title">{{$item['title'] ?? ''}}</h2>
-                        <div class="text">{{$item['sub_title'] ?? ''}}</div>
+                    <h2 class="title">{{ $item->title ?? '' }}</h2>
+                    <div class="text">{{ $item->sub_title ?? '' }}</div>
                     </div>
-                </div>
+                    </div>
                 @endforeach
+
             </div>
         </div>
     </section>
@@ -1979,7 +2005,7 @@
                                     <div class="col-12">
                                         <div class="learn-feature-item">
                                             <div class="learn-feature-icon">
-                                                <img src="{{ asset('storage/app/public/admin_feature')}}/{{ $item['image'] }}"
+                                                <img src="{{ asset('storage/app/admin_feature')}}/{{ $item['image'] }}"
                                                  alt="{{$item['title'] ?? ''}}">
                                             </div>
                                             <div class="learn-feature-item-content">
@@ -2001,7 +2027,7 @@
                                     <div class="col-12">
                                         <div class="learn-feature-item">
                                             <div class="learn-feature-icon">
-                                                <img src="{{ asset('storage/app/public/admin_feature')}}/{{ $item['image'] }}" alt="{{$item['title']}}">
+                                                <img src="{{ asset('storage/app/admin_feature')}}/{{ $item['image'] }}" alt="{{$item['title']}}">
                                             </div>
                                             <div class="learn-feature-item-content">
                                                 <h5 class="subttle">{{$item['title'] ?? ''}}</h5>
@@ -2612,7 +2638,7 @@
             @php($join_as_seller = $landing_data['seller_app_earning_links'])
             <div class="earn-item wow fadeInUp">
                 <div class="earn-item-img"
-                    style="background: url({{ asset('storage/app/public/earning') }}/{{ isset($landing_data['earning_seller_image']) ? $landing_data['earning_seller_image'] : null }}) no-repeat center center / cover;">
+                    style="background: url({{ asset('storage/app/earning') }}/{{ isset($landing_data['earning_seller_image']) ? $landing_data['earning_seller_image'] : null }}) no-repeat center center / cover;">
                     <div class="position-relative">
                         <div class="d-flex flex-column flex-wrap gap-3">
                             @if (isset($join_as_seller['playstore_url_status']) && $join_as_seller['playstore_url_status'] == '1')
@@ -2635,7 +2661,7 @@
             @php($join_as_dm = $landing_data['dm_app_earning_links'])
             <div class="earn-item wow fadeInUp">
                 <div class="earn-item-img"
-                    style="background: url({{ asset('storage/app/public/earning') }}/{{ isset($landing_data['earning_delivery_image']) ? $landing_data['earning_delivery_image'] : null }}) no-repeat center center / cover;">
+                    style="background: url({{ asset('storage/app/earning') }}/{{ isset($landing_data['earning_delivery_image']) ? $landing_data['earning_delivery_image'] : null }}) no-repeat center center / cover;">
                     <div class="position-relative">
                         <div class="d-flex flex-column flex-wrap gap-3">
                             @if (isset($join_as_dm['playstore_url_status']) && $join_as_dm['playstore_url_status'] == '1')
@@ -3361,7 +3387,7 @@
                     
                 <div class="feature-card">
                     <div class="feature-card-icon">
-                        <img src="{{ asset('storage/app/public/special_criteria')}}/{{ isset($item['image']) ? $item['image'] : null }}" alt="{{$item['title']}}"
+                        <img src="{{ asset('storage/app/special_criteria')}}/{{ isset($item['image']) ? $item['image'] : null }}" alt="{{$item['title']}}"
                         onerror="this.src='{{ asset('public/assets/admin/img/160x160/img2.jpg') }}'">
                     </div>
                     <div class="feature-card-cont">
@@ -3578,7 +3604,7 @@
                     @php($fav = \App\Models\BusinessSetting::where(['key' => 'icon'])->first()->value ?? '')
                     <div class="right-side d-flex word-nowrap align-items-center">
                         <img onerror="this.src='{{ asset('public/assets/admin/img/160x160/img2.jpg') }}'"
-                        src="{{ asset('storage/app/public/business/' . $fav) }}" alt="">
+                        src="{{ asset('storage/app/business/' . $fav) }}" alt="">
                         {{translate("messages.Still increasing")}}
                     </div>
                 </div>
@@ -3610,7 +3636,7 @@
                     </div>
                 </div>
                 <div class="col-lg-6 col-md-9">
-                    <img class="mw-100" src="{{ asset('storage/app/public/download_user_app_image') }}/{{ isset($landing_data['download_user_app_image']) ? $landing_data['download_user_app_image'] : null }}" alt="">
+                    <img class="mw-100" src="{{ asset('storage/app/download_user_app_image') }}/{{ isset($landing_data['download_user_app_image']) ? $landing_data['download_user_app_image'] : null }}" alt="">
                 </div>
             </div>
         </div>
@@ -3639,14 +3665,14 @@
                         </blockquote>
                         <div class="d-flex align-items-center justify-content-between">
                             <div class="user">
-                                <img src="{{ asset('storage/app/public/reviewer_image')}}/{{ $data['reviewer_image'] }}" alt="">
+                                <img src="{{ asset('storage/app/reviewer_image')}}/{{ $data['reviewer_image'] }}" alt="">
                                 <div>
                                     <h6 class="name">{{ $data['name'] }}</h6>
                                     <span class="designation">{{ $data['designation'] }}</span>
                                 </div>
                             </div>
                             @if (isset($data['company_image']))
-                            <img style="max-height: 35px; max-width:75px" src="{{ asset('storage/app/public/reviewer_company_image')}}/{{ $data['company_image'] }}" alt="">
+                            <img style="max-height: 35px; max-width:75px" src="{{ asset('storage/app/reviewer_company_image')}}/{{ $data['company_image'] }}" alt="">
                             @endif
                         </div>
                     </div>
