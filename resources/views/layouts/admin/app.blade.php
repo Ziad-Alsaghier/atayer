@@ -58,7 +58,7 @@
         <div class="col-md-12">
             <div id="loading" class="initial-hidden">
                 <div class="loader--inner">
-                    <img width="200" src="{{asset('public/assets/admin/img/loader.gif')}}">
+                    <img width="200" src="{{asset('assets/admin/img/loader.gif')}}">
                 </div>
             </div>
         </div>
