@@ -26,23 +26,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 
 <!-- CSS Implementing Plugins -->
-<link rel="stylesheet" href="{{ asset('assets/admin/css/vendor.min.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/admin/vendor/icon-set/style.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/admin/css/custom.css') }}">
+<link rel="stylesheet" href="{{ asset('public/assets/admin/css/vendor.min.css') }}">
+<link rel="stylesheet" href="{{ asset('public/assets/admin/vendor/icon-set/style.css') }}">
+<link rel="stylesheet" href="{{ asset('public/assets/admin/css/custom.css') }}">
 
 <!-- CSS Front Template -->
-<link rel="stylesheet" href="{{ asset('assets/admin/css/owl.min.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/admin/css/bootstrap.min.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/admin/css/theme.minc619.css?v=1.0') }}">
-<link rel="stylesheet" href="{{ asset('assets/admin/css/bootstrap-tour-standalone.min.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/admin/css/emogi-area.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/admin/css/style.css') }}">
+<link rel="stylesheet" href="{{ asset('public/assets/admin/css/owl.min.css') }}">
+<link rel="stylesheet" href="{{ asset('public/assets/admin/css/bootstrap.min.css') }}">
+<link rel="stylesheet" href="{{ asset('public/assets/admin/css/theme.minc619.css?v=1.0') }}">
+<link rel="stylesheet" href="{{ asset('public/assets/admin/css/bootstrap-tour-standalone.min.css') }}">
+<link rel="stylesheet" href="{{ asset('public/assets/admin/css/emogi-area.css') }}">
+<link rel="stylesheet" href="{{ asset('public/assets/admin/css/style.css') }}">
 
     @stack('css_or_js')
 
     <script
-        src="{{asset('assets/admin')}}/vendor/hs-navbar-vertical-aside/hs-navbar-vertical-aside-mini-cache.js"></script>
-    <link rel="stylesheet" href="{{asset('assets/admin')}}/css/toastr.css">
+        src="{{asset('public/assets/admin')}}/vendor/hs-navbar-vertical-aside/hs-navbar-vertical-aside-mini-cache.js"></script>
+    <link rel="stylesheet" href="{{asset('public/assets/admin')}}/css/toastr.css">
 </head>
 
 <body class="footer-offset">
@@ -58,7 +58,7 @@
         <div class="col-md-12">
             <div id="loading" class="initial-hidden">
                 <div class="loader--inner">
-                    <img width="200" src="{{asset('assets/admin/img/loader.gif')}}">
+                    <img width="200" src="{{asset('public/assets/admin/img/loader.gif')}}">
                 </div>
             </div>
         </div>
@@ -205,21 +205,21 @@
 <!-- ========== END MAIN CONTENT ========== -->
 
 <!-- ========== END SECONDARY CONTENTS ========== -->
-<script src="{{asset('assets/admin')}}/js/custom.js"></script>
+<script src="{{asset('public/assets/admin')}}/js/custom.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.2/firebase.js"></script>
 <!-- JS Implementing Plugins -->
 
 @stack('script')
 <!-- JS Front -->
-<script src="{{asset('assets/admin')}}/js/vendor.min.js"></script>
-<script src="{{asset('assets/admin')}}/js/theme.min.js"></script>
-<script src="{{asset('assets/admin')}}/js/sweet_alert.js"></script>
-<script src="{{asset('assets/admin')}}/js/bootstrap-tour-standalone.min.js"></script>
-<script src="{{asset('assets/admin')}}/js/"></script>
-<script src="{{asset('assets/admin/js/owl.min.js')}}"></script>
+<script src="{{asset('public/assets/admin')}}/js/vendor.min.js"></script>
+<script src="{{asset('public/assets/admin')}}/js/theme.min.js"></script>
+<script src="{{asset('public/assets/admin')}}/js/sweet_alert.js"></script>
+<script src="{{asset('public/assets/admin')}}/js/bootstrap-tour-standalone.min.js"></script>
+<script src="{{asset('public/assets/admin')}}/js/"></script>
+<script src="{{asset('public/assets/admin/js/owl.min.js')}}"></script>
 <script src="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css"></script>
-<script src="{{asset('assets/admin')}}/js/emogi-area.js"></script>
-<script src="{{asset('assets/admin')}}/js/toastr.js"></script>
+<script src="{{asset('public/assets/admin')}}/js/emogi-area.js"></script>
+<script src="{{asset('public/assets/admin')}}/js/toastr.js"></script>
 
 <script>
     $('.blinkings').on('mouseover', ()=> $('.blinkings').removeClass('active'))
@@ -484,7 +484,7 @@
     
 </script>
 <audio id="myAudio">
-    <source src="{{asset('assets/admin/sound/notification.mp3')}}" type="audio/mpeg">
+    <source src="{{asset('public/assets/admin/sound/notification.mp3')}}" type="audio/mpeg">
 </audio>
 
 <script>
@@ -882,12 +882,12 @@
         if ($('#'+toggle_id).is(':checked')) {
             $('#toggle-title').empty().append(on_title);
             $('#toggle-message').empty().append(on_message);
-            $('#toggle-image').attr('src', "{{asset('/assets/admin/img/modal')}}/"+on_image);
+            $('#toggle-image').attr('src', "{{asset('/public/assets/admin/img/modal')}}/"+on_image);
             $('#toggle-ok-button').attr('toggle-ok-button', toggle_id);
         } else {
             $('#toggle-title').empty().append(off_title);
             $('#toggle-message').empty().append(off_message);
-            $('#toggle-image').attr('src', "{{asset('/assets/admin/img/modal')}}/"+off_image);
+            $('#toggle-image').attr('src', "{{asset('/public/assets/admin/img/modal')}}/"+off_image);
             $('#toggle-ok-button').attr('toggle-ok-button', toggle_id);
         }
         $('#toggle-modal').modal('show');
@@ -918,12 +918,12 @@
         if ($('#'+toggle_id).is(':checked')) {
             $('#toggle-status-title').empty().append(on_title);
             $('#toggle-status-message').empty().append(on_message);
-            $('#toggle-status-image').attr('src', "{{asset('assets/admin/img/modal')}}/"+on_image);
+            $('#toggle-status-image').attr('src', "{{asset('public/assets/admin/img/modal')}}/"+on_image);
             $('#toggle-status-ok-button').attr('toggle-ok-button', toggle_id);
         } else {
             $('#toggle-status-title').empty().append(off_title);
             $('#toggle-status-message').empty().append(off_message);
-            $('#toggle-status-image').attr('src', "{{asset('assets/admin/img/modal')}}/"+off_image);
+            $('#toggle-status-image').attr('src', "{{asset('public/assets/admin/img/modal')}}/"+off_image);
             $('#toggle-status-ok-button').attr('toggle-ok-button', toggle_id);
         }
         $('#toggle-status-modal').modal('show');
@@ -988,7 +988,7 @@
 
 
 {{-- <script>
-    if (/MSIE \d|Trident.*rv:/.test(navigator.userAgent)) document.write('<script src="{{asset('assets/admin')}}/vendor/babel-polyfill/polyfill.min.js"><\/script>');
+    if (/MSIE \d|Trident.*rv:/.test(navigator.userAgent)) document.write('<script src="{{asset('public/assets/admin')}}/vendor/babel-polyfill/polyfill.min.js"><\/script>');
 </script> --}}
 </body>
 </html>
