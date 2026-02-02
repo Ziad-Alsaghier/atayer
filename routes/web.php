@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/webhook/atayer', [AtayerWebhookController::class, 'handle']);
+Route::post('/public_html/atayer', [AtayerWebhookController::class, 'handle']);
 
  Route::get('/clear-cache', function() {
  $exitCode = Artisan::call('cache:clear');
