@@ -19,7 +19,7 @@
             <div class="banner-content wow fadeInUp">
                 <h1 class="title">{{ $landing_data['fixed_header_title'] }}</h1>
                     <img class="w-100"
-                    onerror="this.src='{{ asset('public/assets/admin/img/160x160/img2.jpg') }}'"
+                    onerror="this.src='{{ asset('assets/admin/img/160x160/img2.jpg') }}'"
                     src="{{ asset('storage/business/'.($logo ?? 'def.png')) }}"
                     alt="">
 
@@ -1905,9 +1905,9 @@
                         class="__img-50"
                         src="{{ $item->icon
                         ? asset('storage/module/' . $item->icon)
-                        : asset('public/assets/admin/img/100x100/2.png') }}"
+                        : asset('assets/admin/img/100x100/2.png') }}"
                         alt=""
-                        onerror="this.onerror=null; this.src='{{ asset('public/assets/admin/img/100x100/2.png') }}';">
+                        onerror="this.onerror=null; this.src='{{ asset('assets/admin/img/100x100/2.png') }}';">
 
                         <div class="txt d-block">
                         {{ translate("messages.{$item->module_name}") }}
@@ -1933,8 +1933,8 @@
                             <img
                             src="{{ !empty($item->thumbnail)
                             ? asset('storage/module/'.$item->thumbnail)
-                            : asset('public/assets/admin/img/100x100/2.png') }}"
-                            onerror="this.onerror=null;this.src='{{ asset('public/assets/admin/img/100x100/2.png') }}';"
+                            : asset('assets/admin/img/100x100/2.png') }}"
+                            onerror="this.onerror=null;this.src='{{ asset('assets/admin/img/100x100/2.png') }}';"
                             alt="">
                         </div>
 
@@ -1956,7 +1956,7 @@
                     <div class="category-slide-item"
                     style="background-image: url('{{ !empty($item->image)
                     ? asset('storage/promotional_banner/'.$item->image)
-                    : asset('public/assets/admin/img/160x160/img2.jpg') }}');
+                    : asset('assets/admin/img/160x160/img2.jpg') }}');
                     background-repeat: no-repeat;
                     background-position: center;
                     background-size: cover;">
@@ -1975,7 +1975,7 @@
 
     <!-- ==== Learn Feature Section Starts Here ==== -->
     <section class="learn-feature-section"
-        style="background: url({{ asset('public/assets/landing/img/learn-feature-bg.svg') }}) no-repeat center center / cover">
+        style="background: url({{ asset('assets/landing/img/learn-feature-bg.svg') }}) no-repeat center center / cover">
         <div class="container position-relative">
             <div class="row gy-5 gx-0 gx-xl-4">
                 <div class=" col-lg-6 pe-lg-5">
@@ -3388,7 +3388,7 @@
                 <div class="feature-card">
                     <div class="feature-card-icon">
                         <img src="{{ asset('storage/app/special_criteria')}}/{{ isset($item['image']) ? $item['image'] : null }}" alt="{{$item['title']}}"
-                        onerror="this.src='{{ asset('public/assets/admin/img/160x160/img2.jpg') }}'">
+                        onerror="this.src='{{ asset('assets/admin/img/160x160/img2.jpg') }}'">
                     </div>
                     <div class="feature-card-cont">
                         <h4 class="subtitle">
@@ -3603,7 +3603,7 @@
                     </div>
                     @php($fav = \App\Models\BusinessSetting::where(['key' => 'icon'])->first()->value ?? '')
                     <div class="right-side d-flex word-nowrap align-items-center">
-                        <img onerror="this.src='{{ asset('public/assets/admin/img/160x160/img2.jpg') }}'"
+                        <img onerror="this.src='{{ asset('assets/admin/img/160x160/img2.jpg') }}'"
                         src="{{ asset('storage/app/business/' . $fav) }}" alt="">
                         {{translate("messages.Still increasing")}}
                     </div>
