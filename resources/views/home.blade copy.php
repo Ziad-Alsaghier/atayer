@@ -18,7 +18,7 @@
             <div class="banner-content wow fadeInUp">
                 <h1 class="title">{{ isset($landing_page_text['header_title_1']) ? $landing_page_text['header_title_1'] : '' }}</h1>
                     <img class="w-100" 
-                    onerror="this.src='{{ asset('assets/admin/img/160x160/img2.jpg') }}'" 
+                    onerror="this.src='{{ asset('public/assets/admin/img/160x160/img2.jpg') }}'" 
                     src="{{ asset('storage/business/' . $logo) }}" 
                     alt="">
 

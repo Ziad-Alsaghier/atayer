@@ -22,9 +22,9 @@
     <link rel="stylesheet" href="{{ asset('assets/landing/css/customize-animate.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/landing/css/odometer.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/landing/css/owl.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/toastr.css') }}">
+    <link rel="stylesheet" href="{{ asset('public/assets/admin/css/toastr.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/landing/css/select2.min.css') }}">
-<img src="{{ asset('assets/admin/img/160x160/img2.jpg') }}">
+<img src="{{ asset('public/assets/admin/img/160x160/img2.jpg') }}">
     @php($icon = \App\Models\BusinessSetting::where(['key' => 'icon'])->first()?->value ?? null)
    <link rel="stylesheet" href="{{ asset('assets/landing/css/main.css') }}" />
 
@@ -157,8 +157,8 @@
                             <img
                             src="{{ !empty($logo)
                             ? asset('storage/business/'.$logo)
-                            : asset('assets/admin/img/160x160/img2.jpg') }}"
-                            onerror="this.onerror=null;this.src='{{ asset('assets/admin/img/160x160/img2.jpg') }}';"
+                            : asset('public/assets/admin/img/160x160/img2.jpg') }}"
+                            onerror="this.onerror=null;this.src='{{ asset('public/assets/admin/img/160x160/img2.jpg') }}';"
                             alt="Logo">
                             </a>
 
@@ -206,7 +206,7 @@
     <script src="{{ asset('assets/landing/js/odometer.min.js') }}"></script>
     <script src="{{ asset('assets/landing/js/owl.min.js') }}"></script>
     <script src="{{ asset('assets/landing/js/main.js') }}"></script>
-    <script src="{{ asset('assets/admin/js/toastr.js') }}"></script>
+    <script src="{{ asset('public/assets/admin/js/toastr.js') }}"></script>
 
     {!! Toastr::message() !!}
     @if ($errors->any())

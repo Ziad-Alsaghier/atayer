@@ -191,7 +191,7 @@
                                 <div class="col-lg-6">
                                     <div class="form-group pt-3 mb-5">
                                         <img class="__register-img mb-3" id="viewer"
-                                        src="{{ asset('assets/admin/img/400x400/img2.jpg') }}"
+                                        src="{{ asset('public/assets/admin/img/400x400/img2.jpg') }}"
                                         alt="delivery-man image" />
 
                                         <label  class="input-label">{{ translate('messages.deliveryman') }} {{ translate('messages.image') }}<small

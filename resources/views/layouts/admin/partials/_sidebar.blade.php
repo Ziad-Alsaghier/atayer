@@ -9,13 +9,13 @@
         class="navbar-brand-logo initial--36"
         src="{{ asset('storage/business/' . ($store_logo ?? '160x160/img2.jpg')) }}"
         alt="Logo"
-        onerror="this.onerror=null; this.src='{{ asset('assets/admin/img/160x160/img2.jpg') }}';">
+        onerror="this.onerror=null; this.src='{{ asset('public/assets/admin/img/160x160/img2.jpg') }}';">
 
     <img
         class="navbar-brand-logo-mini initial--36"
         src="{{ asset('storage/business/' . ($store_logo ?? '160x160/img2.jpg')) }}"
         alt="Logo"
-        onerror="this.onerror=null; this.src='{{ asset('assets/admin/img/160x160/img2.jpg') }}';">
+        onerror="this.onerror=null; this.src='{{ asset('public/assets/admin/img/160x160/img2.jpg') }}';">
 </a>
 
                 <!-- End Logo -->
@@ -1102,7 +1102,7 @@
                             <div class="cmn--media right-dropdown-icon d-flex align-items-center">
                                 <div class="avatar avatar-sm avatar-circle">
                                     <img class="avatar-img"
-                                        onerror="this.src='{{asset('assets/admin/img/160x160/img1.jpg')}}'"
+                                        onerror="this.src='{{asset('public/assets/admin/img/160x160/img1.jpg')}}'"
                                         src="{{asset('storage/app/admin')}}/{{auth('admin')->user()->image}}"
                                         alt="Image Description">
                                     <span class="avatar-status avatar-sm-status avatar-status-success"></span>
@@ -1123,7 +1123,7 @@
                                 <div class="media align-items-center">
                                     <div class="avatar avatar-sm avatar-circle mr-2">
                                         <img class="avatar-img"
-                                                onerror="this.src='{{asset('assets/admin/img/160x160/img1.jpg')}}'"
+                                                onerror="this.src='{{asset('public/assets/admin/img/160x160/img1.jpg')}}'"
                                                 src="{{asset('storage/app/admin')}}/{{auth('admin')->user()->image}}"
                                                 alt="Image Description">
                                     </div>

@@ -87,7 +87,7 @@
                                 <img id="viewer"
                                 class="avatar-img"
                                 src="{{ asset('storage/admin/' . (auth('admin')->user()->image ?? '')) }}"
-                                onerror="this.src='{{ asset('assets/admin/img/160x160/img1.jpg') }}'"
+                                onerror="this.src='{{ asset('public/assets/admin/img/160x160/img1.jpg') }}'"
                                 alt="Image">
 
 
