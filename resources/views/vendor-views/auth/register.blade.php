@@ -2,7 +2,7 @@
 @section('title', translate('messages.store_registration'))
 @push('css_or_js')
     <link rel="stylesheet" href="{{ asset('public/assets/admin/css/toastr.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/landing/css/select2.min.css') }}">
+<link rel="stylesheet" href="{{ asset('public/assets/landing/css/select2.min.css') }}">
 
     <style>
         #map {
