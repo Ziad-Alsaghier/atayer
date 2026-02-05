@@ -174,7 +174,7 @@
                                 <div class="form-group">
 
                                     <img class="__register-img" id="coverImageViewer"
-                                        src="{{ asset('public/public/assets/admin/img/900x400/img1.jpg') }}"
+                                        src="{{ asset('public/assets/admin/img/900x400/img1.jpg') }}"
                                         alt="Product thumbnail" />
 
                                     <label for="name" class="input-label pt-2">{{ translate('messages.upload') }} {{ translate('messages.cover') }}
@@ -191,7 +191,7 @@
                                 <div class="form-group">
 
                                     <img class="__register-img" id="logoImageViewer"
-                                        src="{{ asset('public/public/assets/admin/img/160x160/img1.jpg') }}"
+                                        src="{{ asset('public/assets/admin/img/160x160/img1.jpg') }}"
                                         alt="Product thumbnail" />
 
 
@@ -213,7 +213,7 @@
                                     <label class="input-label" for="choice_zones">{{ translate('messages.zone') }} <span
                                             class="form-label-secondary" data-toggle="tooltip" data-placement="right"
         data-original-title="{{ translate('messages.select_zone_for_map') }}"><img
-                                                src="{{ asset('/public/public/assets/admin/img/info-circle.svg') }}"
+                                                src="{{ asset('public/assets/admin/img/info-circle.svg') }}"
                                                 alt="{{ translate('messages.select_zone_for_map') }}"></span></label>
                                     <select name="zone_id" id="choice_zones" required class="form-control __form-control js-select2-custom js-example-basic-single"
                                         data-placeholder="{{ translate('messages.select') }} {{ translate('messages.zone') }}">
@@ -254,7 +254,7 @@
                                     <label class="input-label" for="latitude">{{ translate('messages.latitude') }} <span
                                             class="input-label-secondary"
                                             title="{{ translate('messages.store_lat_lng_warning') }}"><img
-                                                src="{{ asset('/public/public/assets/admin/img/info-circle.svg') }}"
+                                                src="{{ asset('public/assets/admin/img/info-circle.svg') }}"
                                                 alt="{{ translate('messages.store_lat_lng_warning') }}"></span></label>
                                     <input type="text" id="latitude" name="latitude" class="form-control __form-control"
                                         placeholder="{{ translate('messages.Ex:') }} -94.22213" value="{{ old('latitude') }}" required readonly>
@@ -265,7 +265,7 @@
                                     <label class="input-label" for="longitude">{{ translate('messages.longitude') }} <span
                                             class="input-label-secondary"
                                             title="{{ translate('messages.store_lat_lng_warning') }}"><img
-                                                src="{{ asset('/public/public/assets/admin/img/info-circle.svg') }}"
+                                                src="{{ asset('public/assets/admin/img/info-circle.svg') }}"
                                                 alt="{{ translate('messages.store_lat_lng_warning') }}"></span></label>
                                     <input type="text" name="longitude" class="form-control __form-control" placeholder="{{ translate('messages.Ex:') }} 103.344322"
                                         id="longitude" value="{{ old('longitude') }}" required readonly>
@@ -358,7 +358,7 @@
                                 <div class="form-group">
                                     <label class="input-label"
                                         for="exampleInputPassword">{{ translate('messages.password') }}<span class="form-label-secondary" data-toggle="tooltip" data-placement="right"
-        data-original-title="{{ translate('messages.Must_contain_at_least_one_number_and_one_uppercase_and_lowercase_letter_and_symbol,_and_at_least_8_or_more_characters') }}"><img src="{{ asset('/public/public/assets/admin/img/info-circle.svg') }}" alt="{{ translate('messages.Must_contain_at_least_one_number_and_one_uppercase_and_lowercase_letter_and_symbol,_and_at_least_8_or_more_characters') }}"></span></label>
+        data-original-title="{{ translate('messages.Must_contain_at_least_one_number_and_one_uppercase_and_lowercase_letter_and_symbol,_and_at_least_8_or_more_characters') }}"><img src="{{ asset('public/assets/admin/img/info-circle.svg') }}" alt="{{ translate('messages.Must_contain_at_least_one_number_and_one_uppercase_and_lowercase_letter_and_symbol,_and_at_least_8_or_more_characters') }}"></span></label>
                                     <input type="password" name="password"
                                         placeholder="{{ translate('messages.password_length_placeholder', ['length' => '6+']) }}"
                                         class="form-control __form-control form-control __form-control-user" minlength="6" id="exampleInputPassword" required
@@ -442,7 +442,7 @@
             });
         </script>
 
-        <script src="{{ asset('public/public/assets/admin/js/spartan-multi-image-picker.js') }}"></script>
+        <script src="{{ asset('public/assets/admin/js/spartan-multi-image-picker.js') }}"></script>
         <script type="text/javascript">
             $(function() {
                 $("#coba").spartanMultiImagePicker({
@@ -452,7 +452,7 @@
                     groupClassName: 'col-lg-2 col-md-4 col-sm-4 col-6',
                     maxFileSize: '',
                     placeholderImage: {
-                        image: '{{ asset('public/public/assets/admin/img/400x400/img2.jpg') }}',
+                        image: '{{ asset('public/assets/admin/img/400x400/img2.jpg') }}',
                         width: '100%'
                     },
                     dropFileLabel: "Drop Here",

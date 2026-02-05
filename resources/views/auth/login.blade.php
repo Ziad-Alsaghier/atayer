@@ -205,7 +205,7 @@
           <img src="{{ asset('public/assets/admin/img/send-mail.svg') }}" alt="">
 
             <!-- After Succeed -->
-            <!-- <img src="{{asset('/public/public/assets/admin/img/sent-mail.svg')}}" alt=""> -->
+            <!-- <img src="{{asset('public/assets/admin/img/sent-mail.svg')}}" alt=""> -->
             <h4>
                 {{ translate('Send_Mail_to_Your_Email') }} ? 
             </h4>
@@ -235,7 +235,7 @@
         <div class="forget-pass-content">
           <img src="{{ asset('public/assets/admin/img/send-mail.svg') }}" alt="">
             <!-- After Succeed -->
-            <!-- <img src="{{asset('/public/public/assets/admin/img/sent-mail.svg')}}" alt=""> -->
+          <img src="{{asset('public/assets/admin/img/sent-mail.svg')}}" alt="">
             <h4>
                 {{ translate('messages.Send_Mail_to_Your_Email') }} ? 
             </h4>
@@ -261,7 +261,7 @@
         <div class="modal-body">
           <div class="forget-pass-content">
               <!-- After Succeed -->
-              <img src="{{asset('/public/public/assets/admin/img/sent-mail.svg')}}" alt="">
+              <img src="{{asset('public/assets/admin/img/sent-mail.svg')}}" alt="">
               <h4>
                 {{ translate('A mail has been sent to your registered email') }}!
               </h4>
@@ -402,7 +402,7 @@
 
 <!-- IE Support -->
 <script>
-    if (/MSIE \d|Trident.*rv:/.test(navigator.userAgent)) document.write('<script src="{{asset('public//public/assets/admin')}}/vendor/babel-polyfill/polyfill.min.js"><\/script>');
+    if (/MSIE \d|Trident.*rv:/.test(navigator.userAgent)) document.write('<script src="{{asset('public/assets/admin')}}/vendor/babel-polyfill/polyfill.min.js"><\/script>');
 </script>
 </body>
 </html>
