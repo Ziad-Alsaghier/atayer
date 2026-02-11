@@ -1,0 +1,45 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class AddColumnToCustomerAddressesTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        if (!Schema::hasTable('customer_addresses')) {
+            Schema::create('customer_addresses', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('user_id');
+                $table->string('address_line', 255)->nullable();
+                $table->string('floor')->nullable();
+                $table->string('road')->nullable();
+                $table->string('house')->nullable();
+                $table->timestamps();
+            });
+        }
+
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        if (!Schema::hasTable('customer_addresses')) {
+            Schema::table('customer_addresses', function (Blueprint $table) {
+                $table->dropColumn('floor');
+                $table->dropColumn('road');
+                $table->dropColumn('house');
+            });
+        }
+    }
+}

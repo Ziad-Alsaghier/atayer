@@ -103,7 +103,7 @@ class HomeController extends Controller
             'dm_app_earning_links'=> (isset($settings['dm_app_earning_links']) )  ? json_decode($settings['dm_app_earning_links'], true) : null ,
             'download_user_app_links'=> (isset($settings['download_user_app_links']) )  ? json_decode($settings['download_user_app_links'], true) : null ,
         ];
-
+            
         return view('home',compact('landing_data'));
     }
 

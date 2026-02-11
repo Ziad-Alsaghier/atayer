@@ -13,11 +13,14 @@ class CreateNewslettersTable extends Migration
      */
     public function up()
     {
-        Schema::create('newsletters', function (Blueprint $table) {
-            $table->id();
-            $table->string('email',191)->unique()->comment('Subscribers email');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('newsletters')) {
+            Schema::create('newsletters', function (Blueprint $table) {
+                $table->id();
+                $table->string('email', 191)->unique()->comment('Subscribers email');
+                $table->timestamps();
+            });
+        }
+
     }
 
     /**

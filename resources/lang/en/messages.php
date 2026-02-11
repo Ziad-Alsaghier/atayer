@@ -4126,4 +4126,5 @@
   'تاكسى' => 'تاكسى',
   'Must_contain_at_least_one_number_and_one_uppercase_and_lowercase_letter_and_symbol,_and_at_least_8_or_more_characters' => 'Must contain at least one number and one uppercase and lowercase letter and symbol  and at least 8 or more characters',
   'E' => 'E',
+  'Main Module' => 'Main Module',
 );

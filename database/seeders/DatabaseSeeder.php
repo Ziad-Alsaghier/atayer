@@ -2,94 +2,175 @@
 
 namespace Database\Seeders;
 
+use App\Models\Admin;
+use App\Models\AdminWallet;
+use App\Models\Category;
+use App\Models\Coupon;
+use App\Models\Currency;
+use App\Models\DeliveryMan;
+use App\Models\Item;
+use App\Models\ItemCampaign;
+use App\Models\Module;
+use App\Models\Store;
+use App\Models\User;
+use App\Models\Vendor;
+use App\Models\Zone;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // ====== الجداول الأب أولاً ======
-        DB::table('accounttransactions')->insert([]);
-        DB::table('adminfeatures')->insert([]);
-        DB::table('adminpromotionalbanners')->insert([]);
-        DB::table('adminroles')->insert([]);
-        DB::table('adminspecialcriterias')->insert([]);
-        DB::table('admintestimonials')->insert([]);
-        DB::table('adminwallets')->insert([['admin_id' => null]]);
-        DB::table('attributes')->insert([]);
-        DB::table('businesssettings')->insert([]);
-        DB::table('contacts')->insert([]);
-        DB::table('currencies')->insert([
-            [
-                'country' => 'Example Country',
-                'currency_code' => 'USD',
-                'currency_symbol' => '$',
-                'exchange_rate' => 30.50 // number, not string
-            ]
-        ]);
-        DB::table('customeraddresses')->insert([]);
-        DB::table('dmvehicles')->insert([]);
-        DB::table('datasettings')->insert([]);
-        DB::table('deliverymanwallets')->insert([['delivery_man_id' => null]]);
-        DB::table('emailtemplates')->insert([]);
-        DB::table('emailverificationses')->insert([]);
-        DB::table('employeeroles')->insert([]);
-        DB::table('flutterspecialcriterias')->insert([]);
-        DB::table('itemtags')->insert([]);
-        DB::table('modules')->insert([]);
-        DB::table('moduletypes')->insert([]);
-        DB::table('modulezones')->insert([]);
-        DB::table('newsletters')->insert([['email' => 'ziad_email']]);
-        DB::table('notificationmessages')->insert([]);
-        DB::table('ordercancelreasons')->insert([]);
-        DB::table('orderdeliveryhistories')->insert([]);
-        DB::table('phoneverifications')->insert([]);
-        DB::table('reacttestimonials')->insert([]);
-        DB::table('refundreasons')->insert([]);
-        DB::table('socialmedias')->insert([]);
-        DB::table('storewallets')->insert([['vendor_id' => null]]);
-        DB::table('tags')->insert([['tag' => 'example_tag']]);
-        DB::table('trackdeliverymans')->insert([]);
-        DB::table('translations')->insert([['translationable_type' => 1, 'translationable_id' => 1, 'locale' => 'example_locale', 'key' => 'example_key', 'value' => 'example_value']]);
-        DB::table('units')->insert([]);
-        DB::table('users')->insert([['name' => 'example_name', 'f_name' => 'example_f_name', 'l_name' => 'example_l_name', 'phone' => 'example_phone', 'email' => 'example_email', 'password' => 'example_password', 'login_medium' => 'example_login_medium', 'ref_by' => 'example_ref_by', 'social_id' => null]]);
-        DB::table('usernotifications')->insert([]);
-        DB::table('vendors')->insert([['remember_token' => 'example_remember_token']]);
-        DB::table('zones')->insert([]);
 
-        // ====== الجداول التي تحتوي على علاقات ======
-        DB::table('addons')->insert([['store_id' => DB::table('stores')->value('id')]]);
-        DB::table('admins')->insert([['remember_token' => 'example_remember_token', 'adminrole_id' => DB::table('adminroles')->value('id')]]);
-        DB::table('banners')->insert([['zone_id' => DB::table('zones')->value('id'), 'module_id' => DB::table('modules')->value('id')]]);
-        DB::table('campaigns')->insert([['module_id' => DB::table('modules')->value('id')]]);
-        DB::table('categories')->insert([['module_id' => DB::table('modules')->value('id'), 'category_id' => DB::table('categories')->value('id')]]);
-        DB::table('conversations')->insert([['userinfo_id' => DB::table('userinfos')->value('id'), 'message_id' => DB::table('messages')->value('id')]]);
-        DB::table('coupons')->insert([['module_id' => DB::table('modules')->value('id'), 'store_id' => DB::table('stores')->value('id')]]);
-        DB::table('dmreviews')->insert([['user_id' => DB::table('users')->value('id'), 'order_id' => DB::table('orders')->value('id'), 'deliveryman_id' => DB::table('deliverymans')->value('id')]]);
-        DB::table('deliveryhistories')->insert([['deliveryman_id' => DB::table('deliverymans')->value('id')]]);
-        DB::table('deliverymans')->insert([['dmvehicle_id' => DB::table('dmvehicles')->value('id'), 'zone_id' => DB::table('zones')->value('id')]]);
-        DB::table('discounts')->insert([['start_date' => now(), 'end_date' => now(), 'start_time' => now(), 'end_time' => now(), 'min_purchase' => 'example_min_purchase', 'max_discount' => 'example_max_discount', 'discount' => 'example_discount', 'discount_type' => 1, 'store_id' => DB::table('stores')->value('id')]]);
-        DB::table('expenses')->insert([['store_id' => DB::table('stores')->value('id'), 'order_id' => DB::table('orders')->value('id'), 'deliveryman_id' => DB::table('deliverymans')->value('id')]]);
-        DB::table('items')->insert([['unit_id' => DB::table('units')->value('id'), 'module_id' => DB::table('modules')->value('id'), 'store_id' => DB::table('stores')->value('id'), 'category_id' => DB::table('categories')->value('id')]]);
-        DB::table('itemcampaigns')->insert([['category_id' => DB::table('categories')->value('id'), 'store_id' => DB::table('stores')->value('id'), 'module_id' => DB::table('modules')->value('id')]]);
-        DB::table('loyaltypointtransactions')->insert([['user_id' => DB::table('users')->value('id')]]);
-        DB::table('mailconfigs')->insert([['store_id' => DB::table('stores')->value('id')]]);
-        DB::table('messages')->insert([['userinfo_id' => DB::table('userinfos')->value('id'), 'conversation_id' => DB::table('conversations')->value('id')]]);
-        DB::table('notifications')->insert([['zone_id' => DB::table('zones')->value('id')]]);
-        DB::table('orders')->insert([['deliveryman_id' => DB::table('deliverymans')->value('id'), 'user_id' => DB::table('users')->value('id'), 'coupon_id' => DB::table('coupons')->value('id'), 'store_id' => DB::table('stores')->value('id'), 'zone_id' => DB::table('zones')->value('id'), 'module_id' => DB::table('modules')->value('id'), 'parcelcategory_id' => DB::table('parcelcategories')->value('id')]]);
-        DB::table('orderdetails')->insert([['order_id' => DB::table('orders')->value('id'), 'item_id' => DB::table('items')->value('id'), 'itemcampaign_id' => DB::table('itemcampaigns')->value('id')]]);
-        DB::table('ordertransactions')->insert([['order_id' => DB::table('orders')->value('id'), 'deliveryman_id' => DB::table('deliverymans')->value('id')]]);
-        DB::table('parcelcategories')->insert([['module_id' => DB::table('modules')->value('id')]]);
-        DB::table('providedmearnings')->insert([['deliveryman_id' => DB::table('deliverymans')->value('id')]]);
-        DB::table('refunds')->insert([['order_id' => DB::table('orders')->value('id')]]);
-        DB::table('reviews')->insert([['item_id' => DB::table('items')->value('id'), 'user_id' => DB::table('users')->value('id')]]);
-        DB::table('stores')->insert([['vendor_id' => DB::table('vendors')->value('id'), 'module_id' => DB::table('modules')->value('id'), 'zone_id' => DB::table('zones')->value('id')]]);
-        DB::table('storeschedules')->insert([['store_id' => DB::table('stores')->value('id'), 'day' => 'example_day', 'opening_time' => now(), 'closing_time' => now()]]);
-        DB::table('userinfos')->insert([['user_id' => DB::table('users')->value('id'), 'vendor_id' => DB::table('vendors')->value('id'), 'deliveryman_id' => DB::table('deliverymans')->value('id'), 'admin_id' => DB::table('admins')->value('id')]]);
-        DB::table('vendoremployees')->insert([['remember_token' => 'example_remember_token', 'store_id' => DB::table('stores')->value('id'), 'vendor_id' => DB::table('vendors')->value('id'), 'employeerole_id' => DB::table('employeeroles')->value('id')]]);
-        DB::table('wallettransactions')->insert([['user_id' => DB::table('users')->value('id')]]);
-        DB::table('wishlists')->insert([['item_id' => DB::table('items')->value('id'), 'store_id' => DB::table('stores')->value('id')]]);
-        DB::table('withdrawrequests')->insert([['vendor_id' => DB::table('vendors')->value('id')]]);
+      $this->call([
+            NewsletterSeeder::class,      // Depends on Countries
+            OrderSeeder::class,  // Can be after
+            OrderDetailSeeder::class,  // Can be after
+            ReviewSeeder::class,  // Can be after
+            SocialMediaSeeder::class,  // Can be after
+            UserSeeder::class,  // Can be after
+        ]);
+        // ====== Modules ======
+        $module = Module::create([
+            'module_name' => 'Main Module',
+            'module_type' => 'default', // <-- required
+            'description' => 'Default Module',
+            'status' => 1,               // optional, has default
+            'stores_count' => 0,         // optional, has default
+            'theme_id' => 1,             // optional, has default
+            'all_zone_service' => 0      // optional, has default
+        ]);
+
+
+        // ====== Zones ======
+        $zone = Zone::create([
+            'name' => 'Default Zone',
+            'coordinates' => DB::raw("ST_GeomFromText('POLYGON((0 0,0 1,1 1,1 0,0 0))')"),
+        ]);
+
+        // ====== Admin ======
+        $admin = Admin::create([
+            'f_name' => 'Master',
+            'l_name' => 'Admin',
+            'email' => 'admin@example.com',
+            'password' => Hash::make('password123'),
+            'role_id' => 1,
+        ]);
+
+        // ====== Admin Wallet ======
+        AdminWallet::create([
+            'admin_id' => $admin->id,
+            'total_commission_earning' => 0,
+            'digital_received' => 0,
+            'manual_received' => 0,
+            'delivery_charge' => 0
+        ]);
+
+        // ====== Vendors ======
+        $vendor = Vendor::create([
+            'f_name' => 'Default',
+            'l_name' => 'Vendor',
+            'phone' => '0123456789', // Required field in migration
+            'email' => 'vendor@example.com',
+            'password' => Hash::make('password123'),
+            'remember_token' => 'vendor_token',
+            'status' => 1, // optional, default is 1
+        ]);
+
+        // ====== Stores ======
+        $store = Store::create([
+            'name' => 'Default Store',
+            'phone' => '0123456789',
+            'vendor_id' => $vendor->id,
+            'module_id' => $module->id,
+            'zone_id' => $zone->id,
+        ]);
+
+        // ====== Currency ======
+        Currency::create([
+            'country' => 'Example Country',
+            'currency_code' => 'USD',
+            'currency_symbol' => '$',
+            'exchange_rate' => 30.50
+        ]);
+
+        // ====== Users ======
+        $user = User::create([
+            'f_name' => 'Example',
+            'l_name' => 'User',
+            'phone' => '01122334455',
+            'email' => 'user@example.com',
+            'image' => null,                  // optional
+            'is_phone_verified' => 0,         // default
+            'email_verified_at' => null,      // optional
+            'password' => Hash::make('password123'),
+            'remember_token' => null,         // optional
+            'interest' => null,               // optional
+            'cm_firebase_token' => null,      // optional
+            'status' => 1,                    // default
+            'order_count' => 0,               // default
+            'login_medium' => null,           // optional
+            'social_id' => null,              // optional
+            'zone_id' => null,                // optional
+            'wallet_balance' => 0.000,        // default
+            'loyalty_point' => 0.000,         // default
+            'ref_code' => null                // optional
+        ]);
+
+        // ====== Categories ======
+        $category = Category::create([
+            'name' => 'Default Category',
+            'module_id' => $module->id,
+            'parent_id' => 0,
+            'position' => 1,
+        ]);
+
+        // ====== Items ======
+        $item = Item::create([
+            'name' => 'Sample Item',
+            'store_id' => $store->id,
+            'module_id' => $module->id,
+            'category_id' => $category->id,
+            'price' => 100,
+        ]);
+
+        // ====== Item Campaigns ======
+        ItemCampaign::create([
+            'title' => 'Sample Campaign',
+            'store_id' => $store->id,
+            'module_id' => $module->id,
+            'category_id' => $category->id,
+            'admin_id' => $admin->id,
+            'price' => 50,
+        ]);
+
+        // ====== Coupons ======
+        Coupon::create([
+            'title' => '10% OFF',
+            'code' => 'DISCOUNT10',
+            'discount' => 10,
+            'discount_type' => 'percentage',
+            'module_id' => $module->id,
+            'store_id' => $store->id,
+            'status' => 1,
+        ]);
+
+        // ====== Delivery Men ======
+        $deliveryMan = DeliveryMan::create([
+            'f_name' => 'John',
+            'l_name' => 'Doe',
+            'phone' => '01098765432',
+            'password' => Hash::make('password123'),
+            'zone_id' => $zone->id,
+            'type' => 'zone_wise',
+        ]);
+
+        // ====== Example: linking Item to Store ======
+        $store->items()->save($item); // if $item is a model instance
+
+        // ====== Add more seeders as needed ======
+        // Use the same approach: insert parents first, then children.
     }
 }

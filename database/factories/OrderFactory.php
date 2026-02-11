@@ -22,12 +22,13 @@ class OrderFactory extends Factory
     public function definition()
     {
         return [
-            'user_id' => $this->faker->numberBetween(1,50),
-            'zone_id' => $this->faker->numberBetween(1,6),
+            'user_id' => $this->faker->numberBetween(1, 50),
+            'zone_id' => $this->faker->numberBetween(1, 6),
             'order_amount' => $this->faker->randomNumber(3),
-            'order_status'=>$this->faker->randomElement(['pending','delivered','failed','confirmed','processing']),
-            'store_id'=>$this->faker->numberBetween(1,50),
-            'store_discount_amount'=>$this->faker->randomNumber(3),
+            'module_id' => 1,
+            'order_status' => $this->faker->randomElement(['pending', 'delivered', 'failed', 'confirmed', 'processing']),
+            'store_id' => $this->faker->numberBetween(1, 50),
+            'store_discount_amount' => $this->faker->randomNumber(3),
         ];
     }
 }

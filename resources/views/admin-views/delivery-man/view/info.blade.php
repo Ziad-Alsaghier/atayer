@@ -349,38 +349,41 @@
                 <div class="pl-3"><span class="te">{{ translate('Identity_Type') }}</span> : {{ translate($dm->identity_type)}}</div>
                 <div class="pl-3"><span class="te">{{ translate('messages.identification_number') }}</span> : {{ $dm->identity_number}}</div>
                 <div class="row g-3">
-                    @foreach (json_decode($dm->identity_image) as $key => $img)
-                        <div class="col-auto">
-                                <button class="btn w-100" data-toggle="modal"
-                                    data-target="#image-{{ $key }}">
-                                    <div class="gallary-card">
-                                        <img onerror="this.src='{{ asset('/public/assets/admin/img/900x400/img1.jpg') }}'"
-                                        src="{{ asset('storage/app/public/delivery-man') }}/{{ $img }}" class="w-100">
-                                    </div>
-                                </button>
-                                <div class="modal fade" id="image-{{ $key }}" tabindex="-1" role="dialog"
-                                aria-labelledby="myModlabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h4 class="modal-title" id="myModlabel">
-                                                {{ translate('messages.Identity_Image') }}</h4>
-                                            <button type="button" class="close" data-dismiss="modal"><span
-                                                    aria-hidden="true">&times;</span><span
-                                                    class="sr-only">{{ translate('messages.Close') }}</span></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <img onerror="this.src='{{ asset('/public/assets/admin/img/900x400/img1.jpg') }}'"
-                                                src="{{ asset('storage/app/public/delivery-man/' . $img) }}"
-                                                class="w-100">
-                                        </div>
-                                        <div class="modal-footer">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
+                @foreach (json_decode($dm->identity_image) ?? [] as $key => $img)
+    <div class="col-auto">
+        <button class="btn w-100" data-toggle="modal" data-target="#image-{{ $key }}">
+            <div class="gallary-card">
+                <img 
+                    onerror="this.src='{{ asset('/public/assets/admin/img/900x400/img1.jpg') }}'"
+                    src="{{ asset('storage/app/public/delivery-man/' . $img) }}" 
+                    class="w-100">
+            </div>
+        </button>
+        <div class="modal fade" id="image-{{ $key }}" tabindex="-1" role="dialog"
+            aria-labelledby="myModlabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModlabel">{{ translate('messages.Identity_Image') }}</h4>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span aria-hidden="true">&times;</span>
+                            <span class="sr-only">{{ translate('messages.Close') }}</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <img 
+                            onerror="this.src='{{ asset('/public/assets/admin/img/900x400/img1.jpg') }}'"
+                            src="{{ asset('storage/app/public/delivery-man/' . $img) }}"
+                            class="w-100">
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endforeach
+
                 </div>
             </div>
         </div>

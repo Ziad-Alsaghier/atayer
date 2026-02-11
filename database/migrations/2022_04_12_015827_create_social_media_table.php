@@ -13,13 +13,16 @@ class CreateSocialMediaTable extends Migration
      */
     public function up()
     {
-        Schema::create('social_media', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('link');
-            $table->boolean('status')->default(true);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('social_media')) {
+            Schema::create('social_media', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('link');
+                $table->boolean('status')->default(true);
+                $table->timestamps();
+            });
+        }
+
     }
 
     /**
