@@ -241,6 +241,19 @@ class ConfigController extends Controller
             return response()->json(['errors' => Helpers::error_processor($validator)], 403);
         }
         $response = Http::get('https://maps.googleapis.com/maps/api/place/autocomplete/json?input=' . $request['search_text'] . '&key=' . $this->map_api_key);
+        $data = $response->json();
+        if (isset($data['status']) && $data['status'] !== 'OK') {
+            $searchText = $request->input('search_text');
+            $params = [
+                'q' => $searchText,
+                'format' => 'json',
+                'addressdetails' => 1,
+                'limit' => 5
+            ];
+            $response = Http::withHeaders([
+                'User-Agent' => 'YourAppName/1.0 (your@email.com)'
+            ])->get('https://nominatim.openstreetmap.org/search', $params);
+        }
         return $response->json();
     }
 
