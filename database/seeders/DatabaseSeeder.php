@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
       $this->call([
             NewsletterSeeder::class,      // Depends on Countries
             OrderSeeder::class,  // Can be after
-            OrderDetailSeeder::class,  // Can be after
+            // OrderDetailSeeder::class,  // Can be after
             ReviewSeeder::class,  // Can be after
             SocialMediaSeeder::class,  // Can be after
             UserSeeder::class,  // Can be after
