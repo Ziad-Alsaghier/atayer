@@ -205,15 +205,40 @@ class ConfigController extends Controller
         if ($validator->errors()->count() > 0) {
             return response()->json(['errors' => Helpers::error_processor($validator)], 403);
         }
+
         $point = new Point($request->lat, $request->lng);
-        $zones = Zone::with('modules')->contains('coordinates', $point)->latest()->get(['id', 'status', 'cash_on_delivery', 'digital_payment']);
+
+        $zones = Zone::with('modules')
+            ->contains('coordinates', $point)
+            ->latest()
+            ->get(['id', 'status', 'cash_on_delivery', 'digital_payment']);
+
+        // إذا مفيش zones موجودة، جلب default zone بناءً على اللغة أو latitude/longitude
         if (count($zones) < 1) {
+            // ممكن تحدد شرط اللغة أو أي filter تاني
+            $defaultZone = Zone::with('modules')
+                ->where('status', 1) // zone active
+                ->orderBy('id')       // لو فيه أكتر من واحد، اختر الأول
+                ->first(['id', 'status', 'cash_on_delivery', 'digital_payment']);
+
+            if ($defaultZone) {
+                $data = [$defaultZone->toArray()];
+
+                return response()->json([
+                    'zone_id' => json_encode(array_column($data, 'id')),
+                    'zone_data' => $data,
+                    'default' => true // لتوضح إنه default
+                ], 200);
+            }
+
+            // fallback لو مفيش default
             return response()->json([
                 'errors' => [
                     ['code' => 'coordinates', 'message' => translate('messages.service_not_available_in_this_area')]
                 ]
             ], 404);
         }
+
         $data = array_filter($zones->toArray(), function ($zone) {
             if ($zone['status'] == 1) {
                 return $zone;
@@ -221,7 +246,10 @@ class ConfigController extends Controller
         });
 
         if (count($data) > 0) {
-            return response()->json(['zone_id' => json_encode(array_column($data, 'id')), 'zone_data' => array_values($data)], 200);
+            return response()->json([
+                'zone_id' => json_encode(array_column($data, 'id')),
+                'zone_data' => array_values($data)
+            ], 200);
         }
 
         return response()->json([
@@ -230,6 +258,7 @@ class ConfigController extends Controller
             ]
         ], 403);
     }
+
 
     public function place_api_autocomplete(Request $request)
     {
