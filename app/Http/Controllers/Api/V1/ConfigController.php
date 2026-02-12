@@ -289,6 +289,7 @@ class ConfigController extends Controller
 
         if (!$response->status() != 200) {
             $response = Http::withHeaders([
+                'User-Agent' => 'atayer/1.0 (ziadm01762@gmail.com)', // identify your app
             ])->get('https://nominatim.openstreetmap.org/reverse', [
                         'lat' => $request->lat,
                         'lon' => $request->lng,
