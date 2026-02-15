@@ -389,9 +389,10 @@ public function geocode_api(Request $request)
         return response()->json(['status' => 'ZERO_RESULTS', 'results' => []], 200);
     }
 
-    // ✅ Convert to Google-like format
+    //  Convert to Google-like format
     return response()->json([
-        'status' => 'OK',
+   'source' => 'OSM_CONVERTED',
+  'status' => 'OK',
         'results' => [
             [
                 'formatted_address' => $oj['display_name'],
