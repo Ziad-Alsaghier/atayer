@@ -352,10 +352,10 @@ public function geocode_api(Request $request)
     ]);
 
     if ($validator->fails()) {
-        return response()->json(['errors' => Helpers::error_processor($validator)], 403);
+        return response()->json(['errors' => Helpers::error_processor($validator)], 422);
     }
 
-    // 1) جرّب Google
+    // 1) Try Google first
     if (!empty($this->map_api_key)) {
         $google = Http::get('https://maps.googleapis.com/maps/api/geocode/json', [
             'latlng' => $request->lat . ',' . $request->lng,
@@ -364,24 +364,54 @@ public function geocode_api(Request $request)
 
         if ($google->ok()) {
             $gj = $google->json();
-            // لو status = OK يبقى تمام
-            if (isset($gj['status']) && $gj['status'] === 'OK') {
-                return response()->json($gj);
+            if (($gj['status'] ?? null) === 'OK') {
+                return response()->json($gj, 200);
             }
         }
     }
 
     // 2) Fallback: Nominatim
     $osm = Http::withHeaders([
-        'User-Agent' => 'atayer/1.0 (contact@yourdomain.com)',
+        'User-Agent' => 'atayer/1.0 (ziadm01762@gmail.com)',
+        'Accept-Language' => 'ar',
     ])->get('https://nominatim.openstreetmap.org/reverse', [
         'lat' => $request->lat,
         'lon' => $request->lng,
         'format' => 'json',
+        'addressdetails' => 1,
+        'zoom' => 18,
     ]);
 
-    return response()->json($osm->json(), $osm->status());
+    $oj = $osm->json();
+
+    // لو مفيش عنوان
+    if (!$osm->ok() || empty($oj['display_name'])) {
+        return response()->json(['status' => 'ZERO_RESULTS', 'results' => []], 200);
+    }
+
+    // ✅ Convert to Google-like format
+    return response()->json([
+        'status' => 'OK',
+        'results' => [
+            [
+                'formatted_address' => $oj['display_name'],
+                'geometry' => [
+                    'location' => [
+                        'lat' => (float)$oj['lat'],
+                        'lng' => (float)$oj['lon'],
+                    ]
+                ],
+                'address_components' => [
+                    ['long_name' => $oj['address']['road'] ?? null, 'types' => ['route']],
+                    ['long_name' => $oj['address']['city'] ?? ($oj['address']['state'] ?? null), 'types' => ['locality']],
+                    ['long_name' => $oj['address']['country'] ?? null, 'types' => ['country']],
+                    ['long_name' => $oj['address']['postcode'] ?? null, 'types' => ['postal_code']],
+                ],
+            ]
+        ]
+    ], 200);
 }
+
 
     public function landing_page()
     {
