@@ -317,33 +317,71 @@ class ConfigController extends Controller
         return $response->json();
     }
 
-    public function geocode_api(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'lat' => 'required',
-            'lng' => 'required',
+    // public function geocode_api(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'lat' => 'required',
+    //         'lng' => 'required',
+    //     ]);
+
+    //     if ($validator->errors()->count() > 0) {
+    //         return response()->json(['errors' => Helpers::error_processor($validator)], 403);
+    //     }
+    //     $response = Http::get('https://maps.googleapis.com/maps/api/geocode/json?latlng=' . $request->lat . ',' . $request->lng . '&key=' . $this->map_api_key);
+
+    //     if (!$response->status() != 200) {
+    //         $response = Http::withHeaders([
+    //             'User-Agent' => 'atayer/1.0 (ziadm01762@gmail.com)', // identify your app
+    //         ])->get('https://nominatim.openstreetmap.org/reverse', [
+    //                     'lat' => $request->lat,
+    //                     'lon' => $request->lng,
+    //                     'format' => 'json',
+    //                 ]);
+    //         return $response->json();
+
+    //     }
+    //     // $response = Http::get('https://maps.googleapis.com/maps/api/geocode/json?latlng=' . $request->lat . ',' . $request->lng . '&key=' . $this->map_api_key);
+
+    //     return $response->json();
+    // }
+public function geocode_api(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'lat' => 'required|numeric|between:-90,90',
+        'lng' => 'required|numeric|between:-180,180',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => Helpers::error_processor($validator)], 403);
+    }
+
+    // 1) جرّب Google
+    if (!empty($this->map_api_key)) {
+        $google = Http::get('https://maps.googleapis.com/maps/api/geocode/json', [
+            'latlng' => $request->lat . ',' . $request->lng,
+            'key'    => $this->map_api_key,
         ]);
 
-        if ($validator->errors()->count() > 0) {
-            return response()->json(['errors' => Helpers::error_processor($validator)], 403);
+        if ($google->ok()) {
+            $gj = $google->json();
+            // لو status = OK يبقى تمام
+            if (isset($gj['status']) && $gj['status'] === 'OK') {
+                return response()->json($gj);
+            }
         }
-        $response = Http::get('https://maps.googleapis.com/maps/api/geocode/json?latlng=' . $request->lat . ',' . $request->lng . '&key=' . $this->map_api_key);
-
-        if (!$response->status() != 200) {
-            $response = Http::withHeaders([
-                'User-Agent' => 'atayer/1.0 (ziadm01762@gmail.com)', // identify your app
-            ])->get('https://nominatim.openstreetmap.org/reverse', [
-                        'lat' => $request->lat,
-                        'lon' => $request->lng,
-                        'format' => 'json',
-                    ]);
-            return $response->json();
-
-        }
-        // $response = Http::get('https://maps.googleapis.com/maps/api/geocode/json?latlng=' . $request->lat . ',' . $request->lng . '&key=' . $this->map_api_key);
-
-        return $response->json();
     }
+
+    // 2) Fallback: Nominatim
+    $osm = Http::withHeaders([
+        'User-Agent' => 'atayer/1.0 (contact@yourdomain.com)',
+    ])->get('https://nominatim.openstreetmap.org/reverse', [
+        'lat' => $request->lat,
+        'lon' => $request->lng,
+        'format' => 'json',
+    ]);
+
+    return response()->json($osm->json(), $osm->status());
+}
 
     public function landing_page()
     {
