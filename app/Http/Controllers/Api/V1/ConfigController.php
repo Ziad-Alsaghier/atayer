@@ -317,33 +317,102 @@ class ConfigController extends Controller
         return $response->json();
     }
 
-    public function geocode_api(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'lat' => 'required',
-            'lng' => 'required',
+    // public function geocode_api(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'lat' => 'required',
+    //         'lng' => 'required',
+    //     ]);
+
+    //     if ($validator->errors()->count() > 0) {
+    //         return response()->json(['errors' => Helpers::error_processor($validator)], 403);
+    //     }
+    //     $response = Http::get('https://maps.googleapis.com/maps/api/geocode/json?latlng=' . $request->lat . ',' . $request->lng . '&key=' . $this->map_api_key);
+
+    //     if (!$response->status() != 200) {
+    //         $response = Http::withHeaders([
+    //             'User-Agent' => 'atayer/1.0 (ziadm01762@gmail.com)', // identify your app
+    //         ])->get('https://nominatim.openstreetmap.org/reverse', [
+    //                     'lat' => $request->lat,
+    //                     'lon' => $request->lng,
+    //                     'format' => 'json',
+    //                 ]);
+    //         return $response->json();
+
+    //     }
+    //     // $response = Http::get('https://maps.googleapis.com/maps/api/geocode/json?latlng=' . $request->lat . ',' . $request->lng . '&key=' . $this->map_api_key);
+
+    //     return $response->json();
+    // }
+public function geocode_api(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'lat' => 'required|numeric|between:-90,90',
+        'lng' => 'required|numeric|between:-180,180',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => Helpers::error_processor($validator)], 422);
+    }
+
+    // 1) Try Google first
+    if (!empty($this->map_api_key)) {
+        $google = Http::get('https://maps.googleapis.com/maps/api/geocode/json', [
+            'latlng' => $request->lat . ',' . $request->lng,
+            'key'    => $this->map_api_key,
         ]);
 
-        if ($validator->errors()->count() > 0) {
-            return response()->json(['errors' => Helpers::error_processor($validator)], 403);
+        if ($google->ok()) {
+            $gj = $google->json();
+            if (($gj['status'] ?? null) === 'OK') {
+                return response()->json($gj, 200);
+            }
         }
-        $response = Http::get('https://maps.googleapis.com/maps/api/geocode/json?latlng=' . $request->lat . ',' . $request->lng . '&key=' . $this->map_api_key);
-
-        if (!$response->status() != 200) {
-            $response = Http::withHeaders([
-                'User-Agent' => 'atayer/1.0 (ziadm01762@gmail.com)', // identify your app
-            ])->get('https://nominatim.openstreetmap.org/reverse', [
-                        'lat' => $request->lat,
-                        'lon' => $request->lng,
-                        'format' => 'json',
-                    ]);
-            return $response->json();
-
-        }
-        // $response = Http::get('https://maps.googleapis.com/maps/api/geocode/json?latlng=' . $request->lat . ',' . $request->lng . '&key=' . $this->map_api_key);
-
-        return $response->json();
     }
+
+    // 2) Fallback: Nominatim
+    $osm = Http::withHeaders([
+        'User-Agent' => 'atayer/1.0 (ziadm01762@gmail.com)',
+        'Accept-Language' => 'ar',
+    ])->get('https://nominatim.openstreetmap.org/reverse', [
+        'lat' => $request->lat,
+        'lon' => $request->lng,
+        'format' => 'json',
+        'addressdetails' => 1,
+        'zoom' => 18,
+    ]);
+
+    $oj = $osm->json();
+
+    // لو مفيش عنوان
+    if (!$osm->ok() || empty($oj['display_name'])) {
+        return response()->json(['status' => 'ZERO_RESULTS', 'results' => []], 200);
+    }
+
+    //  Convert to Google-like format
+    return response()->json([
+   'source' => 'OSM_CONVERTED',
+  'status' => 'OK',
+        'results' => [
+            [
+                'formatted_address' => $oj['display_name'],
+                'geometry' => [
+                    'location' => [
+                        'lat' => (float)$oj['lat'],
+                        'lng' => (float)$oj['lon'],
+                    ]
+                ],
+                'address_components' => [
+                    ['long_name' => $oj['address']['road'] ?? null, 'types' => ['route']],
+                    ['long_name' => $oj['address']['city'] ?? ($oj['address']['state'] ?? null), 'types' => ['locality']],
+                    ['long_name' => $oj['address']['country'] ?? null, 'types' => ['country']],
+                    ['long_name' => $oj['address']['postcode'] ?? null, 'types' => ['postal_code']],
+                ],
+            ]
+        ]
+    ], 200);
+}
+
 
     public function landing_page()
     {
