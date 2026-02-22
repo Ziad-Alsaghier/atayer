@@ -1,24 +1,64 @@
 <IfModule mod_rewrite.c>
+
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
     </IfModule>
 
     RewriteEngine On
 
-    # Handle Authorization Header
+    ########################################################
+    # FIX OLD PROJECT PATHS (public/assets → assets)
+    ########################################################
+
+    # internally map /public/... → /...
+    RewriteCond %{REQUEST_URI} ^/public/(.*)$ [NC]
+    RewriteRule ^public/(.*)$ $1 [L]
+
+    ########################################################
+    # HANDLE STORAGE FILES
+    ########################################################
+
+    # allow access to storage files
+    RewriteCond %{REQUEST_URI} ^/storage/(.*)$ [NC]
+    RewriteRule ^storage/(.*)$ storage/$1 [L]
+
+    ########################################################
+    # HANDLE AUTHORIZATION HEADER
+    ########################################################
+
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    # Redirect Trailing Slashes If Not A Folder...
+    ########################################################
+    # REDIRECT TRAILING SLASHES
+    ########################################################
+
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
-    # Send Requests To Front Controller...
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_FILENAME} !-f
+    ########################################################
+    # SERVE FILES DIRECTLY IF EXISTS
+    ########################################################
+
+    RewriteCond %{REQUEST_FILENAME} -d [OR]
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+
+    ########################################################
+    # SEND ALL OTHER REQUESTS TO LARAVEL
+    ########################################################
+
     RewriteRule ^ index.php [L]
-    
-    # cors
+
+</IfModule>
+
+########################################################
+# CORS SUPPORT
+########################################################
+
+<IfModule mod_headers.c>
     Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, OPTIONS, PUT, DELETE"
+    Header set Access-Control-Allow-Headers "Authorization, Content-Type"
 </IfModule>
