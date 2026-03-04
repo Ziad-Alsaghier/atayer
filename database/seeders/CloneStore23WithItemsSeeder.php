@@ -16,7 +16,7 @@ class CloneStore23WithItemsSeeder extends Seeder
     public function run(): void
     {
         $baseStoreId = 23;
-        $storesToCreate = 5; // عدّل العدد براحتك
+        $storesToCreate = 5; // عدّل العدد
 
         $baseStore = Store::withoutGlobalScopes()
             ->with(['translations'])
@@ -31,7 +31,11 @@ class CloneStore23WithItemsSeeder extends Seeder
             ->where('store_id', $baseStoreId)
             ->get();
 
-        DB::transaction(function () use ($baseStore, $baseItems, $storesToCreate) {
+        // ✅ id في translations bigint ومش auto increment → نبدأ من MAX + 1
+        $nextTranslationId = (int) DB::table('translations')->max('id');
+        $nextTranslationId = $nextTranslationId > 0 ? $nextTranslationId + 1 : 1;
+
+        DB::transaction(function () use ($baseStore, $baseItems, $storesToCreate, &$nextTranslationId) {
 
             for ($i = 1; $i <= $storesToCreate; $i++) {
 
@@ -56,12 +60,14 @@ class CloneStore23WithItemsSeeder extends Seeder
                 if ($baseStore->relationLoaded('translations') && $baseStore->translations) {
                     foreach ($baseStore->translations as $t) {
                         Translation::create([
-                            'id' => $this->newTranslationId(),
+                            'id' => $nextTranslationId++,
                             'translationable_type' => Store::class,
                             'translationable_id' => $newStore->id,
                             'locale' => $t->locale,
                             'key' => $t->key,
                             'value' => $t->value,
+                            'created_at' => now(),
+                            'updated_at' => now(),
                         ]);
                     }
                 }
@@ -111,12 +117,14 @@ class CloneStore23WithItemsSeeder extends Seeder
                     if ($baseItem->relationLoaded('translations') && $baseItem->translations) {
                         foreach ($baseItem->translations as $t) {
                             Translation::create([
-                                'id' => $this->newTranslationId(),
+                                'id' => $nextTranslationId++,
                                 'translationable_type' => Item::class,
                                 'translationable_id' => $newItem->id,
                                 'locale' => $t->locale,
                                 'key' => $t->key,
                                 'value' => $t->value,
+                                'created_at' => now(),
+                                'updated_at' => now(),
                             ]);
                         }
                     }
@@ -135,12 +143,6 @@ class CloneStore23WithItemsSeeder extends Seeder
                 }
             }
         });
-    }
-
-    private function newTranslationId(): string
-    {
-        // لأن translations.id عندك مش auto increment
-        return (string) Str::uuid();
     }
 
     private function uniqueEmail(?string $email, int $i): string
@@ -180,7 +182,6 @@ class CloneStore23WithItemsSeeder extends Seeder
         }
 
         if (!$found) {
-            // لو الصور عندك مش على public disk (S3/مسار مختلف) سيب الاسم زي ما هو
             return $imagePathOrName;
         }
 
