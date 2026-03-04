@@ -16,14 +16,16 @@ class CloneStore23WithItemsSeeder extends Seeder
     public function run(): void
     {
         $baseStoreId = 23;
-        $storesToCreate = 5; 
+        $storesToCreate = 5; // عدّل العدد براحتك
 
-        $baseStore = Store::withoutGlobalScopes()->with(['translations'])->find($baseStoreId);
+        $baseStore = Store::withoutGlobalScopes()
+            ->with(['translations'])
+            ->find($baseStoreId);
+
         if (!$baseStore) {
             throw new \Exception("Base store id={$baseStoreId} not found");
         }
 
-        // items بتاعة الستور 23
         $baseItems = Item::withoutGlobalScopes()
             ->with(['translations'])
             ->where('store_id', $baseStoreId)
@@ -35,11 +37,10 @@ class CloneStore23WithItemsSeeder extends Seeder
 
                 // 1) Clone Store
                 $newStore = $baseStore->replicate();
-                $newStore->name = "{$baseStore->name} Copy {$i}";
+                $newStore->name  = "{$baseStore->name} Copy {$i}";
                 $newStore->email = $this->uniqueEmail($baseStore->email, $i);
                 $newStore->phone = $this->uniquePhone($baseStore->phone, $i);
 
-                // خليه ظاهر
                 if (isset($newStore->status)) $newStore->status = 1;
                 if (isset($newStore->active)) $newStore->active = 1;
 
@@ -47,25 +48,25 @@ class CloneStore23WithItemsSeeder extends Seeder
                 $newStore->updated_at = now();
                 $newStore->save();
 
-                // 2) Clone Store Translations (لو موجودة)
+                // 2) Clone Store Translations
+                Translation::where('translationable_type', Store::class)
+                    ->where('translationable_id', $newStore->id)
+                    ->delete();
+
                 if ($baseStore->relationLoaded('translations') && $baseStore->translations) {
                     foreach ($baseStore->translations as $t) {
-                        Translation::updateOrInsert(
-                            [
-                                'translationable_type' => Store::class,
-                                'translationable_id' => $newStore->id,
-                                'locale' => $t->locale,
-                                'key' => $t->key,
-                            ],
-                            [
-                                'value' => $t->value,
-                            ]
-                        );
+                        Translation::create([
+                            'id' => $this->newTranslationId(),
+                            'translationable_type' => Store::class,
+                            'translationable_id' => $newStore->id,
+                            'locale' => $t->locale,
+                            'key' => $t->key,
+                            'value' => $t->value,
+                        ]);
                     }
                 }
 
-                // 3) Clone Store Schedule (لو جدول/موديل موجودين)
-                // لو عندك موديل StoreSchedule واسم العلاقة schedules موجود في Store Model
+                // 3) Clone Store Schedule (اختياري)
                 if (method_exists($newStore, 'schedules') && method_exists($baseStore, 'schedules')) {
                     try {
                         $baseSchedules = $baseStore->schedules()->get();
@@ -77,48 +78,50 @@ class CloneStore23WithItemsSeeder extends Seeder
                             $newSch->save();
                         }
                     } catch (\Throwable $e) {
-                        // لو عندك اختلاف في الجدول/الموديل تجاهله
+                        // ignore
                     }
                 }
 
                 // 4) Clone Items
-                foreach ($baseItems as $idx => $baseItem) {
+                foreach ($baseItems as $baseItem) {
                     $newItem = $baseItem->replicate();
                     $newItem->store_id = $newStore->id;
 
-                    // الاسم (مهم عشان يظهر واضح)
                     if (isset($newItem->name)) {
                         $newItem->name = "{$baseItem->name} ({$i})";
                     }
 
-                    // 5) Clone/Copy Image
-                    // أغلب المشاريع بتخزن item image كـ filename داخل public disk (مثلاً item/xxx.png أو items/xxx.png أو مجرد xxx.png)
+                    // Copy image if exists
                     if (isset($newItem->image) && $newItem->image) {
-                        $newItem->image = $this->copyImageIfExists($newItem->image, "cloned/store{$newStore->id}/");
+                        $newItem->image = $this->copyImageIfExists(
+                            $newItem->image,
+                            "cloned/store{$newStore->id}/"
+                        );
                     }
 
                     $newItem->created_at = now();
                     $newItem->updated_at = now();
                     $newItem->save();
 
-                    // 6) Clone Item Translations
+                    // 5) Clone Item Translations
+                    Translation::where('translationable_type', Item::class)
+                        ->where('translationable_id', $newItem->id)
+                        ->delete();
+
                     if ($baseItem->relationLoaded('translations') && $baseItem->translations) {
                         foreach ($baseItem->translations as $t) {
-                            Translation::updateOrInsert(
-                                [
-                                    'translationable_type' => Item::class,
-                                    'translationable_id' => $newItem->id,
-                                    'locale' => $t->locale,
-                                    'key' => $t->key,
-                                ],
-                                [
-                                    'value' => $t->value,
-                                ]
-                            );
+                            Translation::create([
+                                'id' => $this->newTranslationId(),
+                                'translationable_type' => Item::class,
+                                'translationable_id' => $newItem->id,
+                                'locale' => $t->locale,
+                                'key' => $t->key,
+                                'value' => $t->value,
+                            ]);
                         }
                     }
 
-                    // 7) Clone Tags Pivot (لو item عنده علاقة tags())
+                    // 6) Clone Tags Pivot (اختياري)
                     if (method_exists($baseItem, 'tags') && method_exists($newItem, 'tags')) {
                         try {
                             $tagIds = $baseItem->tags()->pluck('tags.id')->toArray();
@@ -126,12 +129,18 @@ class CloneStore23WithItemsSeeder extends Seeder
                                 $newItem->tags()->sync($tagIds);
                             }
                         } catch (\Throwable $e) {
-                            // تجاهل لو جدول pivot مختلف
+                            // ignore
                         }
                     }
                 }
             }
         });
+    }
+
+    private function newTranslationId(): string
+    {
+        // لأن translations.id عندك مش auto increment
+        return (string) Str::uuid();
     }
 
     private function uniqueEmail(?string $email, int $i): string
@@ -145,19 +154,13 @@ class CloneStore23WithItemsSeeder extends Seeder
 
     private function uniquePhone(?string $phone, int $i): string
     {
-        $phone = preg_replace('/\D+/', '', (string)$phone);
+        $phone = preg_replace('/\D+/', '', (string) $phone);
         if (!$phone) $phone = "01000000000";
-        // نخلي آخر رقم يتغير
-        return substr($phone, 0, max(0, strlen($phone)-1)) . ($i % 10);
+        return substr($phone, 0, max(0, strlen($phone) - 1)) . ($i % 10);
     }
 
-    /**
-     * يحاول ينسخ الصورة على public disk لو موجودة.
-     * لو مش موجودة، يرجّع نفس الاسم كما هو (يعني يربط على نفس الصورة).
-     */
     private function copyImageIfExists(string $imagePathOrName, string $targetDir): string
     {
-        // جرّب كذا احتمال لمسار الصورة
         $candidates = [
             $imagePathOrName,
             "item/{$imagePathOrName}",
@@ -177,17 +180,16 @@ class CloneStore23WithItemsSeeder extends Seeder
         }
 
         if (!$found) {
-            // الصورة مش موجودة على disk → خليها نفس القيمة (يمكن عندك S3 أو مسار مختلف)
+            // لو الصور عندك مش على public disk (S3/مسار مختلف) سيب الاسم زي ما هو
             return $imagePathOrName;
+        }
+
+        if (!$disk->exists($targetDir)) {
+            $disk->makeDirectory($targetDir);
         }
 
         $ext = pathinfo($found, PATHINFO_EXTENSION);
         $newName = $targetDir . Str::random(20) . ($ext ? ".{$ext}" : "");
-
-        // تأكد targetDir موجود
-        if (!$disk->exists($targetDir)) {
-            $disk->makeDirectory($targetDir);
-        }
 
         $disk->copy($found, $newName);
 
