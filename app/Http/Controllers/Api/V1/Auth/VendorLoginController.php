@@ -243,10 +243,18 @@ class VendorLoginController extends Controller
         $store->save();
 
         // stores_count + schedule
-        $store->module->increment('stores_count');
-        if (config('module.' . $store->module->module_type)['always_open']) {
-            StoreLogic::insert_schedule($store->id);
-        }
+        // increment stores_count safely
+if ($store->module) {
+    $store->module->increment('stores_count');
+}
+
+// always_open safely
+$moduleType   = optional($store->module)->module_type;     // delivery / service / default ...
+$moduleConfig = $moduleType ? config('module.' . $moduleType) : null;
+
+if (is_array($moduleConfig) && ($moduleConfig['always_open'] ?? false)) {
+    StoreLogic::insert_schedule($store->id);
+}
 
         // تجهيز translations للـ insert
         foreach ($data as $key => $i) {
