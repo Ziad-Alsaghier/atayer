@@ -17,6 +17,7 @@ use App\Models\Translation;
 use App\Models\VendorEmployee;
 use Grimzy\LaravelMysqlSpatial\Types\Point;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rules\Password;
 
 class VendorLoginController extends Controller
@@ -105,52 +106,109 @@ class VendorLoginController extends Controller
         return $token;
     }
 
-    public function register(Request $request)
-    {
-        $status = BusinessSetting::where('key', 'toggle_store_registration')->first();
-        if(!isset($status) || $status->value == '0')
-        {
-            return response()->json(['errors' => Helpers::error_processor('self-registration', translate('messages.store_self_registration_disabled'))]);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'f_name' => 'required|max:100',
-            'l_name' => 'nullable|max:100',
-            // 'name' => 'required|max:191',
-            // 'address' => 'required|max:1000',
-            'latitude' => 'required',
-            'longitude' => 'required',
-            'email' => 'required|unique:vendors',
-            'phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|max:20|unique:vendors',
-            'minimum_delivery_time' => 'required',
-            'maximum_delivery_time' => 'required',
-            'delivery_time_type'=>'required',
-            'password' => ['required', Password::min(8)->mixedCase()->letters()->numbers()->symbols()->uncompromised()],
-            'zone_id' => 'required',
-            'module_id' => 'required',
-            'logo' => 'required',
-            'tax' => 'required'
+ public function register(Request $request)
+{
+    $status = BusinessSetting::where('key', 'toggle_store_registration')->first();
+    if (!isset($status) || $status->value == '0') {
+        return response()->json([
+            'errors' => Helpers::error_processor('self-registration', translate('messages.store_self_registration_disabled'))
         ]);
+    }
 
-        if($request->zone_id)
-        {
-            $point = new Point($request->latitude, $request->longitude);
-            $zone = Zone::contains('coordinates', $point)->where('id', $request->zone_id)->first();
-            if(!$zone){
-                $validator->getMessageBag()->add('latitude', translate('messages.coordinates_out_of_zone'));
-                return response()->json(['errors' => Helpers::error_processor($validator)], 403);
-            }
-        }
+    $validator = Validator::make($request->all(), [
+        'f_name' => 'required|max:100',
+        'l_name' => 'nullable|max:100',
+        'latitude' => 'required',
+        'longitude' => 'required',
+        'email' => 'required|unique:vendors',
+        'phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|max:20|unique:vendors',
+        'minimum_delivery_time' => 'required',
+        'maximum_delivery_time' => 'required',
+        'delivery_time_type' => 'required',
+        'password' => ['required', Password::min(8)->mixedCase()->letters()->numbers()->symbols()->uncompromised()],
+        'zone_id' => 'required',
+        'module_id' => 'required',
+        'logo' => 'required|file',
+        // cover_photo اختيارية
+        'cover_photo' => 'nullable|file',
+        'tax' => 'required',
+        'translations' => 'required'
+    ]);
 
-        $data = json_decode($request->translations, true);
-
-        if (count($data) < 1) {
-            $validator->getMessageBag()->add('translations', translate('messages.Name and description in english is required'));
-        }
-
-        if ($validator->fails()) {
+    // Zone check
+    if ($request->zone_id) {
+        $point = new Point($request->latitude, $request->longitude);
+        $zone = Zone::contains('coordinates', $point)->where('id', $request->zone_id)->first();
+        if (!$zone) {
+            $validator->getMessageBag()->add('latitude', translate('messages.coordinates_out_of_zone'));
             return response()->json(['errors' => Helpers::error_processor($validator)], 403);
         }
+    }
+
+    /**
+     * translations ممكن تيجي:
+     * - string JSON (الأشهر في form-data)
+     * - array مباشرة (لو client بيبعتها json)
+     */
+    $data = $request->translations;
+
+    if (is_string($data)) {
+        $data = json_decode($data, true);
+    }
+
+    if (!is_array($data) || count($data) < 1) {
+        $validator->getMessageBag()->add('translations', translate('messages.Name and description in english is required'));
+        return response()->json(['errors' => Helpers::error_processor($validator)], 403);
+    }
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => Helpers::error_processor($validator)], 403);
+    }
+
+    // استخراج name/address بشكل آمن (بدون الاعتماد على $data[0] و $data[1])
+    $storeName = null;
+    $storeAddress = null;
+
+    foreach ($data as $t) {
+        $key = $t['key'] ?? null;
+        $val = $t['value'] ?? null;
+
+        if ($key === 'name' && $val) {
+            $storeName = $val;
+        }
+        if (($key === 'address' || $key === 'description') && $val) {
+            // خليها address لو مشروعك بيستخدم description بدل address
+            $storeAddress = $val;
+        }
+    }
+
+    // fallback لو الداتا جاية بالاندكس زي كودك القديم
+    if (!$storeName && isset($data[0]['value'])) {
+        $storeName = $data[0]['value'];
+    }
+    if (!$storeAddress && isset($data[1]['value'])) {
+        $storeAddress = $data[1]['value'];
+    }
+
+    if (!$storeName) {
+        return response()->json([
+            'errors' => [
+                ['code' => 'translations', 'message' => 'Store name is required in translations. (key=name)']
+            ]
+        ], 403);
+    }
+
+    if (!$storeAddress) {
+        return response()->json([
+            'errors' => [
+                ['code' => 'translations', 'message' => 'Store address is required in translations. (key=address)']
+            ]
+        ], 403);
+    }
+
+    try {
+        DB::beginTransaction();
+
         $vendor = new Vendor();
         $vendor->f_name = $request->f_name;
         $vendor->l_name = $request->l_name;
@@ -160,48 +218,71 @@ class VendorLoginController extends Controller
         $vendor->status = null;
         $vendor->save();
 
-        $store = new Store;
-        $store->name = $data[0]['value'];
+        $store = new Store();
+        $store->name = $storeName;
         $store->phone = $request->phone;
         $store->email = $request->email;
+
+        // logo required
         $store->logo = Helpers::upload('store/', 'png', $request->file('logo'));
-        $store->cover_photo = Helpers::upload('store/cover/', 'png', $request->file('cover_photo'));
-        $store->address = $data[1]['value'];
+
+        // cover_photo optional (تجنب null)
+        if ($request->hasFile('cover_photo')) {
+            $store->cover_photo = Helpers::upload('store/cover/', 'png', $request->file('cover_photo'));
+        }
+
+        $store->address = $storeAddress;
         $store->latitude = $request->latitude;
         $store->longitude = $request->longitude;
         $store->vendor_id = $vendor->id;
         $store->zone_id = $request->zone_id;
         $store->tax = $request->tax;
-        $store->delivery_time = $request->minimum_delivery_time .'-'. $request->maximum_delivery_time.' '.$request->delivery_time_type;
+        $store->delivery_time = $request->minimum_delivery_time . '-' . $request->maximum_delivery_time . ' ' . $request->delivery_time_type;
         $store->module_id = $request->module_id;
         $store->status = 0;
         $store->save();
+
+        // stores_count + schedule
         $store->module->increment('stores_count');
-        if(config('module.'.$store->module->module_type)['always_open'])
-        {
+        if (config('module.' . $store->module->module_type)['always_open']) {
             StoreLogic::insert_schedule($store->id);
         }
-     
-        foreach ($data as $key=>$i) {
+
+        // تجهيز translations للـ insert
+        foreach ($data as $key => $i) {
             $data[$key]['translationable_type'] = 'App\Models\Store';
             $data[$key]['translationable_id'] = $store->id;
         }
         Translation::insert($data);
 
-        try{
-            $admin= Admin::where('role_id', 1)->first();
-            $mail_status = Helpers::get_mail_status('registration_mail_status_store');
-            if(config('mail.status') && $mail_status == '1'){
-                Mail::to($request['email'])->send(new \App\Mail\VendorSelfRegistration('pending', $vendor->f_name.' '.$vendor->l_name));
-            }
-            $mail_status = Helpers::get_mail_status('store_registration_mail_status_admin');
-            if(config('mail.status') && $mail_status == '1'){
-                Mail::to($admin['email'])->send(new \App\Mail\StoreRegistration('pending', $vendor->f_name.' '.$vendor->l_name));
-            }
-        }catch(\Exception $ex){
-            info($ex->getMessage());
+        DB::commit();
+    } catch (\Throwable $e) {
+        DB::rollBack();
+        info('Store register error: ' . $e->getMessage());
+
+        return response()->json([
+            'message' => 'Registration failed',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+
+    // mails
+    try {
+        $admin = Admin::where('role_id', 1)->first();
+
+        $mail_status = Helpers::get_mail_status('registration_mail_status_store');
+        if (config('mail.status') && $mail_status == '1') {
+            Mail::to($request['email'])->send(new \App\Mail\VendorSelfRegistration('pending', $vendor->f_name . ' ' . $vendor->l_name));
         }
 
-        return response()->json(['message'=>translate('messages.application_placed_successfully')],200);
+        $mail_status = Helpers::get_mail_status('store_registration_mail_status_admin');
+        if (config('mail.status') && $mail_status == '1' && $admin && !empty($admin['email'])) {
+            Mail::to($admin['email'])->send(new \App\Mail\StoreRegistration('pending', $vendor->f_name . ' ' . $vendor->l_name));
+        }
+    } catch (\Exception $ex) {
+        info($ex->getMessage());
     }
+
+    return response()->json(['message' => translate('messages.application_placed_successfully')], 200);
+}
 }
