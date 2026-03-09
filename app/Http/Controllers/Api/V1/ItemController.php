@@ -367,11 +367,15 @@ class ItemController extends Controller
 
         $storage = [];
         foreach ($reviews as $temp) {
-            $temp['attachment'] = json_decode($temp['attachment']);
-            $temp['item_name'] = null;
-            if($temp->item)
-            {
-                $temp['item_name'] = $temp->item->name;
+           $temp['attachment'] = collect(json_decode($temp['attachment'], true) ?? [])
+    ->map(fn ($file) => asset('assets/reviews/' . rawurlencode($file)))
+    ->values();
+
+$temp['item_name'] = null;
+
+if($temp->item)
+{
+    $temp['item_name'] = $temp->item->name;
                 if(count($temp->item->translations)>0)
                 {
                     $translate = array_column($temp->item->translations->toArray(), 'value', 'key');
