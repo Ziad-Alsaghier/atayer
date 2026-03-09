@@ -98,7 +98,19 @@ class Helpers
                     $item['available_time_ends'] = $item->end_time->format('H:i');
                     unset($item['end_time']);
                 }
+                    $item['image'] = self::image_full_url(
+    $item['image'] ?? null,
+    ['assets/vendor-items', 'assets/reviews'],
+    ['item', 'store', 'store/cover', 'vendor', 'delivery-man', 'order', 'refund']
+);
 
+if (isset($item['images'])) {
+    $item['images'] = self::images_full_url(
+        $item['images'],
+        ['assets/vendor-items', 'assets/reviews'],
+        ['item', 'store', 'store/cover', 'vendor', 'delivery-man', 'order', 'refund']
+    );
+}
                 if ($item->start_date) {
                     $item['available_date_starts'] = $item->start_date->format('Y-m-d');
                     unset($item['start_date']);
@@ -151,6 +163,19 @@ class Helpers
             foreach (json_decode($data['category_ids']) as $value) {
                 $categories[] = ['id' => (string)$value->id, 'position' => $value->position];
             }
+            $data['image'] = self::image_full_url(
+    $data['image'] ?? null,
+    ['assets/vendor-items', 'assets/reviews'],
+    ['item', 'store', 'store/cover', 'vendor', 'delivery-man', 'order', 'refund']
+);
+
+if (isset($data['images'])) {
+    $data['images'] = self::images_full_url(
+        $data['images'],
+        ['assets/vendor-items', 'assets/reviews'],
+        ['item', 'store', 'store/cover', 'vendor', 'delivery-man', 'order', 'refund']
+    );
+}
             $data['category_ids'] = $categories;
 
             $data['attributes'] = json_decode($data['attributes']);
@@ -751,7 +776,7 @@ class Helpers
         if(!request()->is('/api*')){
             $currency = session()->get('currency_code');
         }
-       
+
         return $currency;
     }
 
@@ -1382,13 +1407,13 @@ class Helpers
                     ];
                     if($order->zone){
                         if($order->dm_vehicle_id){
-                            
+
                             $topic = 'delivery_man_'.$order->zone_id.'_'.$order->dm_vehicle_id;
                             self::send_push_notif_to_topic($data, $topic, 'order_request');
                         }
                         self::send_push_notif_to_topic($data, $order->zone->deliveryman_wise_topic, 'order_request');
 
-                        
+
                     }
                 }
                 // self::send_push_notif_to_topic($data, 'admin_message', 'order_request', url('/').'/admin/order/list/all');
@@ -1405,7 +1430,7 @@ class Helpers
                 ];
                 if($order->zone){
                     if($order->dm_vehicle_id){
-                        
+
                         $topic = 'delivery_man_'.$order->zone_id.'_'.$order->dm_vehicle_id;
                         self::send_push_notif_to_topic($data, $topic, 'order_request');
                     }
@@ -1510,7 +1535,7 @@ class Helpers
                 } else
                  {if($order->zone){
                     if($order->dm_vehicle_id){
-                        
+
                         $topic = 'delivery_man_'.$order->zone_id.'_'.$order->dm_vehicle_id;
                         self::send_push_notif_to_topic($data, $topic, 'order_request');
                     }
@@ -2027,7 +2052,7 @@ Storage::disk('public')->put($dir . '/' . $imageName, file_get_contents($image))
     {
         $languages = json_decode(\App\Models\BusinessSetting::where('key', 'system_language')->first()?->value);
         $lang = 'en';
-    
+
         foreach ($languages as $key => $language) {
             if($language->default){
                 $lang = $language->code;
@@ -2039,7 +2064,7 @@ Storage::disk('public')->put($dir . '/' . $imageName, file_get_contents($image))
     {
         $languages = json_decode(\App\Models\BusinessSetting::where('key', 'system_language')->first()?->value);
         $lang = 'en';
-    
+
         foreach ($languages as $key => $language) {
             if($language->default){
                 $lang = $language->direction;
@@ -3025,14 +3050,14 @@ Storage::disk('public')->put($dir . '/' . $imageName, file_get_contents($image))
     {
         $data = $value;
         if ($value) {
-            if($user_name){    
+            if($user_name){
                 $data =  str_replace("{userName}", $user_name, $data);
             }
 
             if($store_name){
                 $data =  str_replace("{storeName}", $store_name, $data);
             }
-            
+
             if($delivery_man_name){
                 $data =  str_replace("{deliveryManName}", $delivery_man_name, $data);
             }
@@ -3103,7 +3128,7 @@ Storage::disk('public')->put($dir . '/' . $imageName, file_get_contents($image))
 
         } catch (\Exception $exception) {
             info($exception->getMessage());
-            
+
             $previous_active[] = [
                 'software_id' => env('REACT_APP_KEY'),
                 'is_active' => 1
@@ -3111,7 +3136,7 @@ Storage::disk('public')->put($dir . '/' . $imageName, file_get_contents($image))
             DB::table('business_settings')->updateOrInsert(['key' => 'app_activation'], [
                 'value' => json_encode($previous_active)
             ]);
-            
+
             return true;
         }
         return false;
@@ -3132,4 +3157,61 @@ Storage::disk('public')->put($dir . '/' . $imageName, file_get_contents($image))
             ]);
         }
     }
+    public static function image_full_url(?string $image, array $publicFolders = [], array $storageFolders = [])
+{
+    if (!$image) {
+        return null;
+    }
+
+    if (Str::startsWith($image, ['http://', 'https://'])) {
+        return $image;
+    }
+
+    // check direct public folders
+    foreach ($publicFolders as $folder) {
+        $folder = trim($folder, '/');
+        if (file_exists(public_path($folder . '/' . $image))) {
+            return asset($folder . '/' . $image);
+        }
+    }
+
+    // check storage/public folders
+    foreach ($storageFolders as $folder) {
+        $folder = trim($folder, '/');
+        if (Storage::disk('public')->exists($folder . '/' . $image)) {
+            return asset('storage/' . $folder . '/' . $image);
+        }
+    }
+
+    // if already a relative public path
+    if (file_exists(public_path($image))) {
+        return asset($image);
+    }
+
+    return asset($image);
+}
+
+public static function images_full_url($images, array $publicFolders = [], array $storageFolders = [])
+{
+    if (is_null($images)) {
+        return [];
+    }
+
+    if (is_string($images)) {
+        $decoded = json_decode($images, true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $images = $decoded;
+        } else {
+            $images = [$images];
+        }
+    }
+
+    if (!is_array($images)) {
+        return [];
+    }
+
+    return array_map(function ($image) use ($publicFolders, $storageFolders) {
+        return self::image_full_url($image, $publicFolders, $storageFolders);
+    }, $images);
+}
 }
