@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Store;
 use App\Models\Vendor;
-use App\Models\StoreSchedule;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -19,18 +18,19 @@ class StoreSeeder extends Seeder
             return;
         }
 
-        // Zone 2 is the valid zone with store_wise_topic
         $zone_id   = 2;
         $module_id = 1;
-        $path = 'assets/reviews/';
+        $path      = 'assets/reviews/';
 
         $stores = [
             [
                 'name'                    => 'مطعم النيل الذهبي',
+                'email'                   => 'nile.golden@store.com',
+                'footer_text'             => 'أفضل مطعم على النيل - توصيل سريع',
                 'address'                 => '15 شارع الجمهورية، القاهرة',
                 'latitude'                => '30.0444',
                 'longitude'               => '31.2357',
-                'logo'                    =>  $path.'store1.png',
+                'logo'                    => $path.'store1.png',
                 'cover_photo'             => $path.'cover1.png',
                 'minimum_order'           => 50.00,
                 'comission'               => 10.00,
@@ -45,10 +45,12 @@ class StoreSeeder extends Seeder
             ],
             [
                 'name'                    => 'كافيه الأندلس',
+                'email'                   => 'andalus.cafe@store.com',
+                'footer_text'             => 'كافيه بأجواء مميزة وقهوة رائعة',
                 'address'                 => '22 شارع التحرير، الجيزة',
                 'latitude'                => '30.0131',
                 'longitude'               => '31.2089',
-                'logo'                    =>  $path.'store2.png',
+                'logo'                    => $path.'store2.png',
                 'cover_photo'             => $path.'cover2.png',
                 'minimum_order'           => 30.00,
                 'comission'               => 8.00,
@@ -63,10 +65,12 @@ class StoreSeeder extends Seeder
             ],
             [
                 'name'                    => 'بيتزا ماركو',
+                'email'                   => 'pizza.marco@store.com',
+                'footer_text'             => 'بيتزا إيطالية أصيلة بأفضل المكونات',
                 'address'                 => '7 شارع مصطفى النحاس، مدينة نصر',
                 'latitude'                => '30.0626',
                 'longitude'               => '31.3419',
-                'logo'                    =>  $path.'store3.png',
+                'logo'                    => $path.'store3.png',
                 'cover_photo'             => $path.'cover3.png',
                 'minimum_order'           => 80.00,
                 'comission'               => 12.00,
@@ -81,10 +85,12 @@ class StoreSeeder extends Seeder
             ],
             [
                 'name'                    => 'سوشي تايم',
+                'email'                   => 'sushi.time@store.com',
+                'footer_text'             => 'سوشي طازج يومياً - خبراء المطبخ الياباني',
                 'address'                 => '3 شارع البحر الأعظم، المهندسين',
                 'latitude'                => '30.0566',
                 'longitude'               => '31.2013',
-                'logo'                    =>  $path.'store4.png',
+                'logo'                    => $path.'store4.png',
                 'cover_photo'             => $path.'cover4.png',
                 'minimum_order'           => 100.00,
                 'comission'               => 15.00,
@@ -99,10 +105,12 @@ class StoreSeeder extends Seeder
             ],
             [
                 'name'                    => 'برجر هاوس',
+                'email'                   => 'burger.house@store.com',
+                'footer_text'             => 'برجر لحم طازج 100% مع صلصات مميزة',
                 'address'                 => '10 شارع عباس العقاد، مدينة نصر',
                 'latitude'                => '30.0550',
                 'longitude'               => '31.3400',
-                'logo'                    =>  $path.'store5.png',
+                'logo'                    => $path.'store5.png',
                 'cover_photo'             => $path.'cover5.png',
                 'minimum_order'           => 60.00,
                 'comission'               => 10.00,
@@ -117,10 +125,12 @@ class StoreSeeder extends Seeder
             ],
             [
                 'name'                    => 'فطير مشلتت الأصيل',
+                'email'                   => 'feteer.aseel@store.com',
+                'footer_text'             => 'فطير مشلتت بالطريقة المصرية الأصيلة',
                 'address'                 => '5 شارع السودان، المهندسين',
                 'latitude'                => '30.0600',
                 'longitude'               => '31.1980',
-                'logo'                    =>  $path.'store6.png',
+                'logo'                    => $path.'store6.png',
                 'cover_photo'             => $path.'cover6.png',
                 'minimum_order'           => 40.00,
                 'comission'               => 7.00,
@@ -135,10 +145,12 @@ class StoreSeeder extends Seeder
             ],
             [
                 'name'                    => 'شاورما الشام',
+                'email'                   => 'shawarma.sham@store.com',
+                'footer_text'             => 'شاورما شامية بالوصفة الأصيلة',
                 'address'                 => '18 شارع فيصل، الجيزة',
                 'latitude'                => '29.9990',
                 'longitude'               => '31.1800',
-                'logo'                    =>  $path.'store7.png',
+                'logo'                    => $path.'store7.png',
                 'cover_photo'             => $path.'cover7.png',
                 'minimum_order'           => 45.00,
                 'comission'               => 9.00,
@@ -153,10 +165,12 @@ class StoreSeeder extends Seeder
             ],
             [
                 'name'                    => 'حلويات نور',
+                'email'                   => 'nour.sweets@store.com',
+                'footer_text'             => 'حلويات شرقية وغربية بأجود المكونات',
                 'address'                 => '33 شارع الهرم، الجيزة',
                 'latitude'                => '29.9870',
                 'longitude'               => '31.1730',
-                'logo'                    =>  $path.'store8.png',
+                'logo'                    => $path.'store8.png',
                 'cover_photo'             => $path.'cover8.png',
                 'minimum_order'           => 35.00,
                 'comission'               => 6.00,
@@ -170,34 +184,38 @@ class StoreSeeder extends Seeder
                 'featured'                => 0,
             ],
         ];
- $phones = [
-            '01000000001', '01000000002', '01000000003', '01000000004',
-            '01000000005', '01000000006', '01000000007', '01000000008',
+
+        $phones = [
+            '01111000001', '01111000002', '01111000003', '01111000004',
+            '01111000005', '01111000006', '01111000007', '01111000008',
         ];
+
         foreach ($stores as $index => $storeData) {
             $store = Store::create(array_merge($storeData, [
-                'phone'                          => $phones[$index],
-                'vendor_id'                      => $vendor->id,
-                'zone_id'                        => $zone_id,
-                'module_id'                      => $module_id,
-                'status'                         => 1,
-                'active'                         => 1,
-                'delivery'                       => 1,
-                'take_away'                      => 1,
-                'schedule_order'                 => 1,
-                'free_delivery'                  => 0,
-                'item_section'                   => 1,
-                'reviews_section'                => 1,
-                'self_delivery_system'           => 0,
-                'pos_system'                     => 0,
-                'cutlery'                        => 0,
-                'prescription_order'             => 0,
-                'off_day'                        => '',
+                'phone'                            => $phones[$index],
+                'vendor_id'                        => $vendor->id,
+                'zone_id'                          => $zone_id,
+                'module_id'                        => $module_id,
+                'status'                           => 1,
+                'active'                           => 1,
+                'delivery'                         => 1,
+                'take_away'                        => 1,
+                'schedule_order'                   => 1,
+                'free_delivery'                    => 0,
+                'item_section'                     => 1,
+                'reviews_section'                  => 1,
+                'self_delivery_system'             => 0,
+                'pos_system'                       => 0,
+                'cutlery'                          => 0,
+                'prescription_order'               => 0,
+                'off_day'                          => '',
                 'order_place_to_schedule_interval' => 0,
+                'rating'                           => json_encode([1=>0, 2=>0, 3=>0, 4=>0, 5=>0]),
+                'gst'                              => json_encode(['status' => false, 'code' => '']),
             ]));
 
-             // Schedule: open every day 9am - 11pm
-              foreach (range(0, 6) as $day) {
+            // Schedule: open every day 9am - 11pm
+            foreach (range(0, 6) as $day) {
                 $maxId = DB::table('store_schedule')->max('id') ?? 0;
                 DB::table('store_schedule')->insert([
                     'id'           => $maxId + 1,
