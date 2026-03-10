@@ -47,9 +47,11 @@ class StoreLogic
             $paginator = $paginator->whereHas('zone.modules', function ($query) {
                 $query->where('modules.id', config('module.current_module_data')['id']);
             })->module(config('module.current_module_data')['id'])
-                ->when(!config('module.current_module_data')['all_zone_service'], function ($query) use ($zone_id) {
-                    $query->whereIn('zone_id', json_decode($zone_id, true));
-                });
+              ->when(!config('module.current_module_data')['all_zone_service'], function ($query) use ($zone_id) {
+    $zone_ids = is_array($zone_id) ? $zone_id : (json_decode($zone_id, true) ?? explode(',', $zone_id));
+    $zone_ids = array_map('intval', (array) $zone_ids); 
+    $query->whereIn('zone_id', $zone_ids);
+});
         } else {
             $paginator = $paginator->whereIn('zone_id', json_decode($zone_id, true));
         }
