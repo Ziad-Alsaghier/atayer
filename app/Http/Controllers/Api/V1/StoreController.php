@@ -29,7 +29,7 @@ class StoreController extends Controller
         $zone_id= $request->header('zoneId');
         $longitude= $request->header('longitude');
         $latitude= $request->header('latitude');
-        $stores = StoreLogic::get_stores( $zone_id, $filter_data, $type, $request['limit'], $request['offset'], $request->query('featured'),$longitude,$latitude,$store_type);
+        $stores = StoreLogic::get_stores( $zone_id, $filter_data, $type,$store_type,  $request['limit'], $request['offset'], $request->query('featured'),$longitude,$latitude,$store_type);
         $stores['stores'] = Helpers::store_data_formatting($stores['stores'], true);
 
         return response()->json($stores, 200);
