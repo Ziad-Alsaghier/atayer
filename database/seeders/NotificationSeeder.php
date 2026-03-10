@@ -10,15 +10,7 @@ class NotificationSeeder extends Seeder
     public function run()
     {
         $zone_id = 2;
-        $userId  = 85035;
         $path = 'assets/reviews/';
-
-        $userExists = DB::table('users')->where('id', $userId)->exists();
-
-        if (!$userExists) {
-            $this->command->error("❌ User ID {$userId} not found.");
-            return;
-        }
 
         $notifications = [
             [
@@ -28,7 +20,6 @@ class NotificationSeeder extends Seeder
                 'status'      => 1,
                 'tergat'      => 'customer',
                 'zone_id'     => $zone_id,
-                'user_id'     => $userId,
             ],
             [
                 'title'       => 'توصيل مجاني هذا الأسبوع',
@@ -37,7 +28,6 @@ class NotificationSeeder extends Seeder
                 'status'      => 1,
                 'tergat'      => 'customer',
                 'zone_id'     => $zone_id,
-                'user_id'     => $userId,
             ],
             [
                 'title'       => 'جديد: سوشي تايم وصل!',
@@ -46,7 +36,6 @@ class NotificationSeeder extends Seeder
                 'status'      => 1,
                 'tergat'      => 'customer',
                 'zone_id'     => $zone_id,
-                'user_id'     => $userId,
             ],
             [
                 'title'       => 'عروض نهاية الأسبوع',
@@ -55,7 +44,6 @@ class NotificationSeeder extends Seeder
                 'status'      => 1,
                 'tergat'      => 'customer',
                 'zone_id'     => $zone_id,
-                'user_id'     => $userId,
             ],
             [
                 'title'       => 'حلويات نور - كوبون جديد',
@@ -64,22 +52,27 @@ class NotificationSeeder extends Seeder
                 'status'      => 1,
                 'tergat'      => 'customer',
                 'zone_id'     => $zone_id,
-                'user_id'     => $userId,
             ],
         ];
 
         foreach ($notifications as $notification) {
             $maxId = DB::table('notifications')->max('id') ?? 0;
 
-            DB::table('notifications')->insert(array_merge($notification, [
-                'id'         => $maxId + 1,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]));
+            DB::table('notifications')->insert([
+                'id'          => $maxId + 1,
+                'title'       => $notification['title'],
+                'description' => $notification['description'],
+                'image'       => $notification['image'],
+                'status'      => $notification['status'],
+                'tergat'      => $notification['tergat'],
+                'zone_id'     => $notification['zone_id'],
+                'created_at'  => now(),
+                'updated_at'  => now(),
+            ]);
 
-            $this->command->info("✅ Added: {$notification['title']} for user {$userId}");
+            $this->command->info("✅ Added: {$notification['title']}");
         }
 
-        $this->command->info("\n🎉 Done! Created " . count($notifications) . " notifications for user {$userId}.");
+        $this->command->info("\n🎉 Done! Created " . count($notifications) . " notifications.");
     }
 }
