@@ -197,8 +197,10 @@ class StoreSeeder extends Seeder
             ]));
 
              // Schedule: open every day 9am - 11pm
-            foreach (range(0, 6) as $day) {
+              foreach (range(0, 6) as $day) {
+                $maxId = DB::table('store_schedule')->max('id') ?? 0;
                 DB::table('store_schedule')->insert([
+                    'id'           => $maxId + 1,
                     'store_id'     => $store->id,
                     'day'          => $day,
                     'opening_time' => '09:00:00',
