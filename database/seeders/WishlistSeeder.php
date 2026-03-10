@@ -10,34 +10,23 @@ class WishlistSeeder extends Seeder
     public function run()
     {
         $userId = 85035;
+        $storeIds = [52, 53, 54, 55, 56, 57, 58];
 
-        $data = [
-            ['user_id' => $userId, 'store_id' => 41],
-            ['user_id' => $userId, 'store_id' => 44],
-            ['user_id' => $userId, 'store_id' => 45],
-            ['user_id' => $userId, 'store_id' => 46],
-            ['user_id' => $userId, 'store_id' => 47],
-            ['user_id' => $userId, 'store_id' => 48],
-            ['user_id' => $userId, 'store_id' => 49],
-            ['user_id' => $userId, 'store_id' => 50],
-            ['user_id' => $userId, 'store_id' => 51],
-        ];
-
-        foreach ($data as $row) {
+        foreach ($storeIds as $storeId) {
             $item = DB::table('items')
-                ->where('store_id', $row['store_id'])
+                ->where('store_id', $storeId)
                 ->where('status', 1)
                 ->orderBy('id')
                 ->first();
 
             if (!$item) {
-                $this->command->warn("⚠️ No active item found for store {$row['store_id']}, skipping.");
+                $this->command->warn("⚠️ No active item found for store {$storeId}, skipping.");
                 continue;
             }
 
             $exists = DB::table('wishlists')
-                ->where('user_id', $row['user_id'])
-                ->where('store_id', $row['store_id'])
+                ->where('user_id', $userId)
+                ->where('store_id', $storeId)
                 ->where('item_id', $item->id)
                 ->exists();
 
@@ -46,16 +35,16 @@ class WishlistSeeder extends Seeder
 
                 DB::table('wishlists')->insert([
                     'id'         => $maxId + 1,
-                    'user_id'    => $row['user_id'],
-                    'store_id'   => $row['store_id'],
+                    'user_id'    => $userId,
+                    'store_id'   => $storeId,
                     'item_id'    => $item->id,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
 
-                $this->command->info("✅ User {$row['user_id']} → Store {$row['store_id']} → Item {$item->id}");
+                $this->command->info("✅ User {$userId} → Store {$storeId} → Item {$item->id}");
             } else {
-                $this->command->warn("⚠️ Already exists: User {$row['user_id']} → Store {$row['store_id']} → Item {$item->id}");
+                $this->command->warn("⚠️ Already exists: User {$userId} → Store {$storeId} → Item {$item->id}");
             }
         }
 
