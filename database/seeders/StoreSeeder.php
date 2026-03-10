@@ -196,9 +196,9 @@ class StoreSeeder extends Seeder
                 'order_place_to_schedule_interval' => 0,
             ]));
 
-            // Schedule: open every day 9am - 11pm
+             // Schedule: open every day 9am - 11pm
             foreach (range(0, 6) as $day) {
-                StoreSchedule::create([
+                DB::table('store_schedule')->insert([
                     'store_id'     => $store->id,
                     'day'          => $day,
                     'opening_time' => '09:00:00',
