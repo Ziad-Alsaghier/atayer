@@ -10,16 +10,25 @@ class NotificationSeeder extends Seeder
     public function run()
     {
         $zone_id = 2;
-         $path = 'assets/reviews/';
+        $userId  = 85035;
+        $path = 'assets/reviews/';
+
+        $userExists = DB::table('users')->where('id', $userId)->exists();
+
+        if (!$userExists) {
+            $this->command->error("❌ User ID {$userId} not found.");
+            return;
+        }
 
         $notifications = [
             [
                 'title'       => 'عرض خاص على مطعم النيل الذهبي',
                 'description' => 'احصل على خصم 20% على جميع الطلبات اليوم فقط!',
-                'image'       => $path.'store1.png',
+                'image'       => $path . 'store1.png',
                 'status'      => 1,
                 'tergat'      => 'customer',
                 'zone_id'     => $zone_id,
+                'user_id'     => $userId,
             ],
             [
                 'title'       => 'توصيل مجاني هذا الأسبوع',
@@ -28,43 +37,49 @@ class NotificationSeeder extends Seeder
                 'status'      => 1,
                 'tergat'      => 'customer',
                 'zone_id'     => $zone_id,
+                'user_id'     => $userId,
             ],
             [
                 'title'       => 'جديد: سوشي تايم وصل!',
                 'description' => 'الآن يمكنك طلب أشهى السوشي مباشرة لباب بيتك.',
-                'image'       => $path.'store3.png',
+                'image'       => $path . 'store3.png',
                 'status'      => 1,
                 'tergat'      => 'customer',
                 'zone_id'     => $zone_id,
+                'user_id'     => $userId,
             ],
             [
                 'title'       => 'عروض نهاية الأسبوع',
                 'description' => 'خصومات حصرية على برجر هاوس وشاورما الشام كل جمعة وسبت.',
-                'image'       => $path.'store4.png',
+                'image'       => $path . 'store4.png',
                 'status'      => 1,
                 'tergat'      => 'customer',
-                'zone_id'     => null, // لكل الـ zones
+                'zone_id'     => $zone_id,
+                'user_id'     => $userId,
             ],
             [
                 'title'       => 'حلويات نور - كوبون جديد',
                 'description' => 'استخدم كود NOUR10 للحصول على خصم 10% على الحلويات.',
-                'image'       => $path.'store5.png',
+                'image'       => $path . 'store5.png',
                 'status'      => 1,
                 'tergat'      => 'customer',
                 'zone_id'     => $zone_id,
+                'user_id'     => $userId,
             ],
         ];
 
         foreach ($notifications as $notification) {
             $maxId = DB::table('notifications')->max('id') ?? 0;
+
             DB::table('notifications')->insert(array_merge($notification, [
                 'id'         => $maxId + 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]));
-            $this->command->info("✅ Added: {$notification['title']}");
+
+            $this->command->info("✅ Added: {$notification['title']} for user {$userId}");
         }
 
-        $this->command->info("\n🎉 Done! Created " . count($notifications) . " notifications.");
+        $this->command->info("\n🎉 Done! Created " . count($notifications) . " notifications for user {$userId}.");
     }
 }
