@@ -562,32 +562,42 @@ if (isset($data['images'])) {
     }
 
     public static function store_data_formatting($data, $multi_data = false)
-    {
-        $storage = [];
-        if ($multi_data == true) {
-            foreach ($data as $item) {
-                $ratings = StoreLogic::calculate_store_rating($item['rating']);
-                unset($item['rating']);
-                $item['avg_rating'] = $ratings['rating'];
-                $item['rating_count'] = $ratings['total'];
-                $item['positive_rating'] = $ratings['positive_rating'];
-                unset($item['campaigns']);
-                unset($item['pivot']);
-                array_push($storage, $item);
-            }
-            $data = $storage;
-        } else {
-            $ratings = StoreLogic::calculate_store_rating($data['rating']);
-            unset($data['rating']);
-            $data['avg_rating'] = $ratings['rating'];
-            $data['rating_count'] = $ratings['total'];
-            $data['positive_rating'] = $ratings['positive_rating'];
-            unset($data['campaigns']);
-            unset($data['pivot']);
-        }
+{
+    $storage = [];
+    if ($multi_data == true) {
+        foreach ($data as $item) {
+            $ratings = StoreLogic::calculate_store_rating($item['rating']);
+            unset($item['rating']);
+            $item['avg_rating'] = $ratings['rating'];
+            $item['rating_count'] = $ratings['total'];
+            $item['positive_rating'] = $ratings['positive_rating'];
 
-        return $data;
+            // ✅ أضف السطرين دول
+            $item['logo'] = self::image_full_url($item['logo'], ['assets/store', 'assets/reviews'], ['store', 'store/cover']);
+            $item['cover_photo'] = self::image_full_url($item['cover_photo'], ['assets/store', 'assets/reviews'], ['store', 'store/cover']);
+
+            unset($item['campaigns']);
+            unset($item['pivot']);
+            array_push($storage, $item);
+        }
+        $data = $storage;
+    } else {
+        $ratings = StoreLogic::calculate_store_rating($data['rating']);
+        unset($data['rating']);
+        $data['avg_rating'] = $ratings['rating'];
+        $data['rating_count'] = $ratings['total'];
+        $data['positive_rating'] = $ratings['positive_rating'];
+
+        
+        $data['logo'] = self::image_full_url($data['logo'], ['assets/store', 'assets/reviews'], ['store', 'store/cover']);
+        $data['cover_photo'] = self::image_full_url($data['cover_photo'], ['assets/store', 'assets/reviews'], ['store', 'store/cover']);
+
+        unset($data['campaigns']);
+        unset($data['pivot']);
     }
+
+    return $data;
+}
 
     public static function wishlist_data_formatting($data, $multi_data = false)
     {
