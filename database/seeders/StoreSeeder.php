@@ -170,9 +170,13 @@ class StoreSeeder extends Seeder
                 'featured'                => 0,
             ],
         ];
-
-        foreach ($stores as $storeData) {
+ $phones = [
+            '01000000001', '01000000002', '01000000003', '01000000004',
+            '01000000005', '01000000006', '01000000007', '01000000008',
+        ];
+        foreach ($stores as $index => $storeData) {
             $store = Store::create(array_merge($storeData, [
+                'phone'                          => $phones[$index],
                 'vendor_id'                      => $vendor->id,
                 'zone_id'                        => $zone_id,
                 'module_id'                      => $module_id,
