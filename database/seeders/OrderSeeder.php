@@ -10,7 +10,7 @@ class OrderSeeder extends Seeder
     public function run()
     {
         // Store IDs من الـ StoreSeeder (44-51)
-        $stores = [44, 45, 46, 47, 48, 49, 50, 51];
+        $stores = [41, 44, 45, 46, 47, 48, 49, 50, 51];
 
         // User IDs الموجودين
         $users = [2, 3, 4, 5];
@@ -19,6 +19,7 @@ class OrderSeeder extends Seeder
         $orders = [
             // ── Running Orders (مش هتظهر في list, بس هتظهر في running-orders) ──
             [
+
                 'user_id'               => 2,
                 'store_id'              => 44,
                 'order_amount'          => 150.00,
@@ -33,6 +34,22 @@ class OrderSeeder extends Seeder
                 'pending'               => now()->subMinutes(30),
                 'confirmed'             => now()->subMinutes(25),
             ],
+            [
+                'user_id'               => 2,
+                'store_id'              => 41,
+                'order_amount'          => 150.00,
+                'payment_status'        => 'unpaid',
+                'order_status'          => 'confirmed',
+                'payment_method'        => 'cash_on_delivery',
+                'order_type'            => 'delivery',
+                'delivery_charge'       => 15.00,
+                'original_delivery_charge' => 15.00,
+                'zone_id'               => 2,
+                'module_id'             => 1,
+                'pending'               => now()->subMinutes(30),
+                'confirmed'             => now()->subMinutes(25),
+            ]
+            ,
             [
                 'user_id'               => 2,
                 'store_id'              => 45,
