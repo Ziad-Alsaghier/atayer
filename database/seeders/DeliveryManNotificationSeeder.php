@@ -24,17 +24,8 @@ class DeliveryManNotificationSeeder extends Seeder
             ->delete();
 
         DB::table('user_notifications')
-    ->where('delivery_man_id', $this->dmId)
-    ->where('data', 'like', '%تم تعيين طلب جديد لك%')
-    ->orWhere(function ($q) {
-        $q->where('delivery_man_id', $this->dmId)
-          ->where('data', 'like', '%تم تسليم الطلب بنجاح%');
-    })
-    ->orWhere(function ($q) {
-        $q->where('delivery_man_id', $this->dmId)
-          ->where('data', 'like', '%تم إضافة رصيد للمحفظة%');
-    })
-    ->delete();
+            ->where('delivery_man_id', $this->dmId)
+            ->delete();
 
         $zoneNotifications = [
             [
@@ -72,7 +63,10 @@ class DeliveryManNotificationSeeder extends Seeder
         ];
 
         foreach ($zoneNotifications as $notification) {
+            $maxId = DB::table('notifications')->max('id') ?? 0;
+
             DB::table('notifications')->insert([
+                'id'          => $maxId + 1,
                 'title'       => $notification['title'],
                 'description' => $notification['description'],
                 'image'       => $notification['image'],
@@ -123,7 +117,10 @@ class DeliveryManNotificationSeeder extends Seeder
         ];
 
         foreach ($userNotifications as $notification) {
+            $maxId = DB::table('user_notifications')->max('id') ?? 0;
+
             DB::table('user_notifications')->insert([
+                'id'              => $maxId + 1,
                 'data'            => json_encode($notification['data'], JSON_UNESCAPED_UNICODE),
                 'status'          => 1,
                 'delivery_man_id' => $this->dmId,
