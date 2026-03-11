@@ -4,90 +4,100 @@ namespace Database\Seeders;
 
 use App\Models\Item;
 use App\Models\Store;
-use App\Models\User;
 use App\Models\DeliveryMan;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 class CurrentOrdersSeeder extends Seeder
 {
+    private int    $userId   = 85035;
+    private array  $storeIds = [52, 53, 54, 55, 56, 57, 58];
+
     /*
     |--------------------------------------------------------------------------
-    | الصور المستخدمة - موجودة في public/assets/reviews
-    | هيتم نسخها تلقائياً لـ storage/app/public/items/ و store/
-    | الـ URL اللي بيرجع: http://domain.com/storage/items/burger.jpg
+    | الصور الموجودة في public/assets/reviews
+    | cover1-8 للـ items  |  store1-8 للمتاجر
     |--------------------------------------------------------------------------
     */
-    private array $itemImages = [
-        'Classic Burger' => 'burger.jpg',
-        'Chicken Pizza'  => 'pizza.jpg',
-        'Healthy Bowl'   => 'bowl.jpg',
-        'Creamy Pasta'   => 'pasta.jpg',
+    private array $itemImageMap = [
+        'Classic Burger' => 'cover1.png',
+        'Chicken Pizza'  => 'cover2.png',
+        'Healthy Bowl'   => 'cover3.png',
+        'Creamy Pasta'   => 'cover4.png',
     ];
 
-    private string $storeImage = 'store.jpg';
-
-    // IDs المتاجر من StoreItemsSeeder
-    private array $storeIds = [52, 53, 54, 55, 56, 57, 58];
+    // store1.png → store8.png  (واحدة لكل store)
+    private array $storeImageMap = [
+        52 => 'store1.png',
+        53 => 'store2.png',
+        54 => 'store3.png',
+        55 => 'store4.png',
+        56 => 'store6.png',
+        57 => 'store7.png',
+        58 => 'store8.png',
+    ];
 
     public function run(): void
     {
-        // STEP 1: نسخ الصور من public/assets/reviews إلى storage
+        // ── 1. نسخ الصور إلى storage ──────────────────────────────────
         $this->copyImagesToStorage();
 
-        // STEP 2: تحديث صور الـ items والمتاجر في DB
+        // ── 2. تحديث صور الـ items في DB ──────────────────────────────
         $this->updateItemImages();
+
+        // ── 3. تحديث صور المتاجر في DB ────────────────────────────────
         $this->updateStoreImages();
 
-        // STEP 3: جلب delivery man
+        // ── 4. تأكد إن المستخدم موجود ─────────────────────────────────
+        $user = DB::table('users')->where('id', $this->userId)->first();
+        if (!$user) {
+            $this->command->error("❌ User ID {$this->userId} not found.");
+            return;
+        }
+
+        // ── 5. جلب أول delivery man ────────────────────────────────────
         $dm = DeliveryMan::withoutGlobalScopes()->first();
         if (!$dm) {
-            $this->command->error('❌ No DeliveryMan found. Run DeliveryManSeeder first.');
+            $this->command->error('❌ No DeliveryMan found.');
             return;
         }
 
-        // STEP 4: جلب المتاجر والمستخدمين
+        // ── 6. حذف orders قديمة للمستخدم ──────────────────────────────
+        $oldIds = DB::table('orders')->where('user_id', $this->userId)->pluck('id');
+        if ($oldIds->isNotEmpty()) {
+            DB::table('order_details')->whereIn('order_id', $oldIds)->delete();
+            DB::table('orders')->whereIn('id', $oldIds)->delete();
+            $this->command->warn("🗑️  Deleted {$oldIds->count()} old orders for user {$this->userId}");
+        }
+
+        // ── 7. إنشاء الـ orders ────────────────────────────────────────
+        $this->command->info("\n📦 Creating CURRENT orders (picked_up) — get_current_orders...");
+        $currentStatuses = ['picked_up', 'handover', 'processing', 'confirmed'];
         $stores = Store::withoutGlobalScopes()->whereIn('id', $this->storeIds)->get();
-        if ($stores->isEmpty()) {
-            $this->command->error('❌ No stores found. Run StoreItemsSeeder first.');
-            return;
-        }
 
-        $users = User::where('status', 1)->limit(10)->get();
-        if ($users->isEmpty()) {
-            $this->command->error('❌ No users found.');
-            return;
-        }
-
-        // ============================================================
-        // STEP 5: get_current_orders → status: picked_up
-        // ============================================================
-        $this->command->info("\n📦 Creating CURRENT orders (picked_up) for get_current_orders...");
         foreach ($stores->take(4) as $i => $store) {
-            $this->createOrder($store, $users[$i % $users->count()], $dm, 'picked_up', false, rand(1, 3));
+            $this->createOrder($store, $user, $dm, $currentStatuses[$i % 4], false, rand(1, 3));
         }
 
-        // ============================================================
-        // STEP 6: get_all_orders → status: delivered & canceled
-        // ============================================================
-        $this->command->info("\n📋 Creating HISTORY orders (delivered & canceled) for get_all_orders...");
+        $this->command->info("\n📋 Creating HISTORY orders (delivered & canceled) — get_all_orders...");
         foreach ($stores as $i => $store) {
-            $this->createOrder($store, $users[$i % $users->count()], $dm, 'delivered', true, rand(24, 72));
-            $this->createOrder($store, $users[($i + 1) % $users->count()], $dm, 'canceled', false, rand(48, 120));
+            $this->createOrder($store, $user, $dm, 'delivered', true,  rand(24, 72));
+            $this->createOrder($store, $user, $dm, 'canceled',  false, rand(48, 120));
         }
 
         $this->command->info("\n🎉 Done!");
-        $this->command->info("🔑 DeliveryMan ID: {$dm->id}  |  auth_token: {$dm->auth_token}");
-        $this->command->line("   GET /api/v1/deliveryman/current-orders  →  picked_up");
+        $this->command->info("👤 User ID: {$this->userId}");
+        $this->command->info("🚴 DeliveryMan ID: {$dm->id}  |  auth_token: {$dm->auth_token}");
+        $this->command->line("   GET /api/v1/deliveryman/current-orders  →  picked_up / handover / processing");
         $this->command->line("   GET /api/v1/deliveryman/all-orders      →  delivered & canceled");
     }
 
-    // ================================================================
-    // إنشاء order كامل مع order_details
-    // ================================================================
+    // ══════════════════════════════════════════════════════════════════
+    // إنشاء order واحد — فقط columns موجودة في DESCRIBE orders
+    // ══════════════════════════════════════════════════════════════════
     private function createOrder(
-        Store       $store,
-        User        $user,
+        object      $store,
+        object      $user,
         DeliveryMan $dm,
         string      $status,
         bool        $paid,
@@ -105,27 +115,39 @@ class CurrentOrdersSeeder extends Seeder
         }
 
         $subtotal       = $items->sum('price');
-        $deliveryCharge = 20;
+        $deliveryCharge = 15.00;
         $taxPercentage  = 5;
         $taxAmount      = round($subtotal * ($taxPercentage / 100), 2);
         $orderAmount    = $subtotal + $deliveryCharge + $taxAmount;
 
-        $base        = now()->subHours($hoursAgo);
-        $deliveredAt = $status === 'delivered' ? $base->copy()->addMinutes(55) : null;
-        $canceledAt  = $status === 'canceled'  ? $base->copy()->addMinutes(10) : null;
+        $base = now()->subHours($hoursAgo);
+
+        // timing بحسب الـ status
+        $confirmedAt  = in_array($status, ['confirmed','processing','handover','picked_up','delivered'])
+                        ? $base->copy()->addMinutes(5) : null;
+        $processingAt = in_array($status, ['processing','handover','picked_up','delivered'])
+                        ? $base->copy()->addMinutes(15) : null;
+        $handoverAt   = in_array($status, ['handover','picked_up','delivered'])
+                        ? $base->copy()->addMinutes(25) : null;
+        $pickedUpAt   = in_array($status, ['picked_up','delivered'])
+                        ? $base->copy()->addMinutes(35) : null;
+        $deliveredAt  = $status === 'delivered' ? $base->copy()->addMinutes(55) : null;
+        $canceledAt   = $status === 'canceled'  ? $base->copy()->addMinutes(10) : null;
+        $acceptedAt   = $confirmedAt ? $base->copy()->addMinutes(3) : null;
 
         $orderId = DB::table('orders')->insertGetId([
-            // أساسي
             'user_id'                  => $user->id,
             'store_id'                 => $store->id,
             'delivery_man_id'          => $dm->id,
+            'zone_id'                  => $store->zone_id ?? 1,
+            'module_id'                => $store->module_id ?? 1,
+
             'order_status'             => $status,
             'payment_status'           => $paid ? 'paid' : 'unpaid',
             'payment_method'           => $paid ? 'wallet' : 'cash_on_delivery',
             'order_type'               => 'delivery',
             'order_note'               => "[SEEDED][{$status}]",
 
-            // مبالغ
             'order_amount'             => $orderAmount,
             'total_tax_amount'         => $taxAmount,
             'tax_percentage'           => $taxPercentage,
@@ -136,55 +158,40 @@ class CurrentOrdersSeeder extends Seeder
             'coupon_discount_amount'   => 0,
             'dm_tips'                  => 0,
             'adjusment'                => '0.00',
+            'distance'                 => 2.5,
+            'discount_on_product_by'   => 'vendor',
 
-            // عنوان التوصيل كامل (بدون null)
             'delivery_address' => json_encode([
                 'contact_person_name'   => trim($user->f_name . ' ' . $user->l_name),
                 'contact_person_number' => $user->phone,
                 'address_type'          => 'Home',
-                'address'               => rand(1, 99) . ' Street, Cairo',
+                'address'               => 'العاشر من رمضان، الشرقية',
                 'floor'                 => (string) rand(1, 10),
                 'road'                  => (string) rand(1, 50),
                 'house'                 => (string) rand(1, 20),
-                'longitude'             => '31.' . rand(100, 300),
-                'latitude'              => '30.0' . rand(10, 99),
+                'longitude'             => '31.7200',
+                'latitude'              => '30.3000',
             ]),
 
-            // بيانات المتجر (بدون null)
-            'store_name'    => $store->name,
-            'store_address' => $store->address,
-            'store_phone'   => $store->phone,
-            'store_lat'     => $store->latitude,
-            'store_lng'     => $store->longitude,
-            'store_logo'    => $this->storeImage,
-
-            // التوقيت
             'schedule_at'         => $base,
             'pending'             => $base,
-            'confirmed'           => $base->copy()->addMinutes(5),
-            'processing'          => $base->copy()->addMinutes(15),
-            'handover'            => $base->copy()->addMinutes(25),
-            'picked_up'           => $base->copy()->addMinutes(35),
+            'accepted'            => $acceptedAt,
+            'confirmed'           => $confirmedAt,
+            'processing'          => $processingAt,
+            'handover'            => $handoverAt,
+            'picked_up'           => $pickedUpAt,
             'delivered'           => $deliveredAt,
             'canceled'            => $canceledAt,
             'canceled_by'         => $status === 'canceled' ? 'customer' : null,
             'cancellation_reason' => $status === 'canceled' ? 'Changed my mind' : null,
 
-            // metadata
-            'otp'                    => str_pad(rand(1000, 9999), 4, '0', STR_PAD_LEFT),
-            'scheduled'              => 0,
-            'checked'                => 0,
-            'edited'                 => 0,
-            'cutlery'                => 0,
-            'item_campaign'          => 0,
-            'prescription_order'     => 0,
-            'distance'               => round(rand(8, 50) / 10, 1),
-            'zone_id'                => $store->zone_id ?? 1,
-            'module_id'              => $store->module_id ?? 1,
-            'delivery_time'          => '30-45',
-            'min_delivery_time'      => 20,
-            'max_delivery_time'      => 40,
-            'discount_on_product_by' => 'vendor',
+            'otp'                => str_pad(rand(1000, 9999), 4, '0', STR_PAD_LEFT),
+            'scheduled'          => 0,
+            'checked'            => 0,
+            'edited'             => 0,
+            'cutlery'            => 0,
+            'prescription_order' => 0,
+            'delivery_time'      => '30-45',
 
             'created_at' => $base,
             'updated_at' => $base,
@@ -221,58 +228,60 @@ class CurrentOrdersSeeder extends Seeder
             ]);
         }
 
-        $this->command->info("  ✅ Order #{$orderId} | [{$status}] | {$store->name} | {$user->f_name}");
+        $this->command->info("  ✅ Order #{$orderId} | [{$status}] | {$store->name} | items: {$items->count()}");
     }
 
-    // ================================================================
+    // ══════════════════════════════════════════════════════════════════
     // نسخ الصور من public/assets/reviews إلى storage/app/public
-    // ================================================================
+    // ══════════════════════════════════════════════════════════════════
     private function copyImagesToStorage(): void
     {
         $this->command->info("\n📸 Copying images to storage...");
 
         $sourceDir = public_path('assets/reviews');
 
-        $files = [
-            'burger.jpg' => storage_path('app/public/items/burger.jpg'),
-            'pizza.jpg'  => storage_path('app/public/items/pizza.jpg'),
-            'bowl.jpg'   => storage_path('app/public/items/bowl.jpg'),
-            'pasta.jpg'  => storage_path('app/public/items/pasta.jpg'),
-            'store.jpg'  => storage_path('app/public/store/store.jpg'),
-        ];
+        // كل الصور اللي محتاجينها
+        $files = array_merge(
+            array_values($this->itemImageMap),   // cover1-4
+            array_values($this->storeImageMap),  // store1-8
+            ['download.jpg', 'download (1).jpg', 'download (2).jpg', 'download (3).jpg']
+        );
 
-        foreach ($files as $filename => $dest) {
-            // إنشاء الفولدر لو مش موجود
-            $folder = dirname($dest);
-            if (!is_dir($folder)) {
-                mkdir($folder, 0755, true);
-            }
-
+        foreach (array_unique($files) as $filename) {
             $source = $sourceDir . '/' . $filename;
 
+            // تحديد الفولدر في storage
+            $folder  = str_starts_with($filename, 'store') ? 'store' : 'items';
+            $dest    = storage_path("app/public/{$folder}/{$filename}");
+            $destDir = dirname($dest);
+
+            if (!is_dir($destDir)) {
+                mkdir($destDir, 0755, true);
+            }
+
             if (!file_exists($source)) {
-                $this->command->warn("  ⚠️ Not found in public/assets/reviews: {$filename}");
+                $this->command->warn("  ⚠️ Not found: public/assets/reviews/{$filename}");
                 continue;
             }
 
             if (file_exists($dest)) {
-                $this->command->info("  ⏭️  Already in storage: {$filename}");
+                $this->command->line("  ⏭️  Already exists: {$filename}");
                 continue;
             }
 
             copy($source, $dest);
-            $this->command->info("  ✅ Copied: {$filename}");
+            $this->command->info("  ✅ Copied → storage/app/public/{$folder}/{$filename}");
         }
     }
 
-    // ================================================================
+    // ══════════════════════════════════════════════════════════════════
     // تحديث صور الـ items في DB
-    // ================================================================
+    // ══════════════════════════════════════════════════════════════════
     private function updateItemImages(): void
     {
         $this->command->info("\n🖼️  Updating item images...");
 
-        foreach ($this->itemImages as $name => $filename) {
+        foreach ($this->itemImageMap as $name => $filename) {
             $count = DB::table('items')
                 ->whereIn('store_id', $this->storeIds)
                 ->where('name', $name)
@@ -280,25 +289,23 @@ class CurrentOrdersSeeder extends Seeder
                     'image'  => $filename,
                     'images' => json_encode([$filename]),
                 ]);
-
             $this->command->info("  ✅ [{$name}] → {$filename}  ({$count} rows)");
         }
     }
 
-    // ================================================================
-    // تحديث صور المتاجر في DB
-    // ================================================================
+    // ══════════════════════════════════════════════════════════════════
+    // تحديث صور المتاجر في DB (كل متجر بصورته)
+    // ══════════════════════════════════════════════════════════════════
     private function updateStoreImages(): void
     {
         $this->command->info("\n🏪 Updating store images...");
 
-        DB::table('stores')
-            ->whereIn('id', $this->storeIds)
-            ->update([
-                'logo'        => $this->storeImage,
-                'cover_photo' => $this->storeImage,
+        foreach ($this->storeImageMap as $storeId => $filename) {
+            DB::table('stores')->where('id', $storeId)->update([
+                'logo'        => $filename,
+                'cover_photo' => $filename,
             ]);
-
-        $this->command->info('  ✅ Store logos updated.');
+            $this->command->info("  ✅ Store #{$storeId} → {$filename}");
+        }
     }
 }
